@@ -1,9 +1,8 @@
 package com.simulator.event;
 
-import com.model.Generator;
-import com.model.elements.Connection;
-import com.model.elements.Flow;
-import com.model.elements.SpectrumPath;
+import com.simulator.elements.Connection;
+import com.simulator.elements.Generator;
+import com.simulator.elements.TrafficFlow;
 import jsim.event.Entity;
 import jsim.event.Event;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class CircuitReleaseEvent extends Event {
     /**
      * Flow that remove its connection
      */
-    private Flow flow;
+    private TrafficFlow flow;
     /**
      * Connection to remove
      */
@@ -34,7 +33,7 @@ public class CircuitReleaseEvent extends Event {
     /**
      * Constructor class
      */
-    public CircuitReleaseEvent(Entity entity, Generator generator, Flow flow, Connection connectionToRelease) {
+    public CircuitReleaseEvent(Entity entity, Generator generator, TrafficFlow flow, Connection connectionToRelease) {
         super(entity);
         this.generator = generator;
         this.flow = flow;
@@ -45,16 +44,16 @@ public class CircuitReleaseEvent extends Event {
     public void occur() {
 
         /** Look for the connection and remove it*/
-        outerLoop:
-        for (SpectrumPath sp : flow.getSetOfSpectrumPaths()) {
-            for (Connection con : sp.getSetOfConnections())
-                if (con.equals(connectionToRelease)) {
-                    sp.removeConnection(connectionToRelease);
-                    if (sp.getSetOfConnections().size() == 0)
-                        flow.getSetOfSpectrumPaths().remove(sp);
-                    log.debug("Connection released: " + generator.getVertex().getVertexID() + "-" + flow.getDstNode().getVertexID());
-                    break outerLoop;
-                }
-        }
+//        outerLoop:
+//        for (SpectrumPath sp : flow.getSetOfSpectrumPaths()) {
+//            for (Connection con : sp.getSetOfConnections())
+//                if (con.equals(connectionToRelease)) {
+//                    sp.removeConnection(connectionToRelease);
+//                    if (sp.getSetOfConnections().size() == 0)
+//                        flow.getSetOfSpectrumPaths().remove(sp);
+//                    log.debug("Connection released: " + generator.getVertex().getVertexID() + "-" + flow.getDstNode().getVertexID());
+//                    break outerLoop;
+//                }
+//        }
     }
 }

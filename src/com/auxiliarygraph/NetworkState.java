@@ -6,11 +6,9 @@ import com.auxiliarygraph.elements.Path;
 import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
+import com.graph.path.PathElement;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Fran on 6/12/2015.
@@ -22,12 +20,15 @@ public class NetworkState {
     private static List<LightPath> listOfLightPaths;
     private static List<Path> listOfPaths;
 
-    public NetworkState(Gcontroller graph, int granularity, int spectrumWidth) {
+    public NetworkState(Gcontroller graph, int granularity, int spectrumWidth, Set<PathElement> setOfPathElements) {
 
         this.graph = graph;
         this.fiberLinksMap = new HashMap<>();
         this.listOfLightPaths = new ArrayList<>();
         this.listOfPaths = new ArrayList<>();
+
+        for (PathElement pe : setOfPathElements)
+            listOfPaths.add(new Path(pe));
 
         for (EdgeElement edgeElement : graph.getEdgeSet())
             fiberLinksMap.put(edgeElement.getEdgeID(), new FiberLink(granularity, spectrumWidth, edgeElement));

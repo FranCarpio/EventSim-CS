@@ -1,15 +1,24 @@
 package com.launcher;
 
+import com.auxiliarygraph.NetworkState;
+import com.filemanager.Results;
+import com.graph.elements.edge.EdgeElement;
+import com.graph.graphcontroller.Gcontroller;
+import com.graph.path.PathElement;
+import com.graph.path.pathelementimpl.PathElementImpl;
 import com.inputdata.InputParameters;
+import com.inputdata.reader.ImportTopologyFromSNDFile;
 import com.inputdata.reader.ReadFile;
 import com.simulator.Scheduler;
+import com.simulator.elements.Generator;
+import com.simulator.elements.TrafficFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Fran on 4/16/2015.
@@ -23,20 +32,23 @@ public class SimulatorParameters {
     private static int _runNumber = -1;
     private static List<byte[]> listOfSeeds;
     private static int seedCounter = -1;
-    private static boolean widthGuardBands;
-    private static int numberOfCarriers;
-    private static double carrierBandwidth;
-    private static boolean isGrooming;
-    private static int maxNumCarriersForGrooming;
+    private static int spectrumWidth;
+    private static int gridGranularity;
+    private static int numOfMiniGridsPerGB;
+    private static int txCapacityOfTransponders;
+    private static int maxReservedMiniGrids;
+    private static List<Generator> listOfGenerators;
     private static final Logger log = LoggerFactory.getLogger(SimulatorParameters.class);
 
     /**
      * Function to start a set of simulations
      */
     public static void startSimulation() {
+
         /** Input network from a SNDLib file */
         new InputParameters(networkFile);
-        new InitializeSimulator();
+        setGenerators();
+        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, setPaths(ImportTopologyFromSNDFile.getPaths()));
         runSimulation();
     }
 
@@ -45,21 +57,84 @@ public class SimulatorParameters {
      */
     public static void runSimulation() {
 
-        if(_runNumber==numberOfRuns-1){
+        if (_runNumber == numberOfRuns - 1) {
             System.exit(0);
-        }else {
-            _runNumber ++;
-            log.info("Starting run number "+_runNumber);
+        } else {
+            _runNumber++;
+            log.info("Starting run number " + _runNumber);
         }
 
         /** Initialize the scheduler*/
         new Scheduler();
 
-        /** Input network from a SNDLib file */
-        InitializeSimulator.start();
+        /** Create new result files*/
+//        new Results();
+
+        InputParameters.setNodes(SimulatorParameters.get_runNumber());
+        setGenerators();
+        listOfGenerators.forEach(Generator::initialize);
 
         /** Run the simulation */
         Scheduler.startSim();
+    }
+
+    /**
+     * Function to set the generators
+     */
+    public static void setGenerators() {
+
+        listOfGenerators = new ArrayList<>();
+        listOfGenerators.addAll(InputParameters.getListOfSources().stream().map(node -> new Generator(node.getVertex(), node.getListOfTrafficDemands(), node.getArrivalRate(), node.getTrafficClassProb(), node.getDestinationProb())).collect(Collectors.toList()));
+    }
+
+    /**
+     * Function to specify the paths
+     *
+     * @param paths
+     */
+    public static Set<PathElement> setPaths(List<String> paths) {
+
+        List<String> listOfNodes;
+        ArrayList<EdgeElement> listOfIntermediateLinks;
+        Gcontroller graph = InputParameters.getGraph();
+        Set<PathElement> setOfPathElements = new HashSet<>();
+
+        for (String path : paths) {
+            listOfNodes = new ArrayList<>();
+            listOfIntermediateLinks = new ArrayList<>();
+            String[] nodes = path.split("-");
+            Collections.addAll(listOfNodes, nodes);
+
+
+            for (int i = 0; i < listOfNodes.size() - 1; i++) {
+                for (EdgeElement link : graph.getEdgeSet()) {
+                    if (link.getSourceVertex().getVertexID()
+                            .equals(listOfNodes.get(i))
+                            && link.getDestinationVertex().getVertexID()
+                            .equals(listOfNodes.get(i + 1)))
+                        listOfIntermediateLinks.add(link);
+                }
+            }
+
+            PathElement pathElement = new PathElementImpl(graph, graph.getVertex(listOfNodes.get(0)), graph.getVertex(listOfNodes.get(listOfNodes.size() - 1)), listOfIntermediateLinks);
+
+            for (Generator generator : listOfGenerators) {
+                if (!pathElement.getSource().getVertexID()
+                        .equals(generator.getVertex().getVertexID()))
+                    continue;
+                for (TrafficFlow f : generator.getListOfTrafficFlows()) {
+                    if (!pathElement.getDestination().getVertexID()
+                            .equals(f.getDstNode().getVertexID()))
+                        continue;
+                    setOfPathElements.add(pathElement);
+                    log.info("Path Element: " + pathElement.getVertexSequence());
+                    break;
+                }
+            }
+        }
+
+        return setOfPathElements;
+
     }
 
     /**
@@ -87,21 +162,19 @@ public class SimulatorParameters {
                         numberOfRuns = Integer.parseInt(line);
                         break;
                     case 4:
-                        if (line.equals("true"))
-                            widthGuardBands = true;
+                        spectrumWidth = Integer.parseInt(line);
                         break;
                     case 5:
-                        numberOfCarriers = Integer.parseInt(line);
+                        gridGranularity = Integer.parseInt(line);
                         break;
                     case 6:
-                        carrierBandwidth = Double.parseDouble(line);
+                        numOfMiniGridsPerGB = Integer.parseInt(line);
                         break;
                     case 7:
-                        if (line.equals("true"))
-                            isGrooming = true;
+                        txCapacityOfTransponders = Integer.parseInt(line);
                         break;
                     case 8:
-                        maxNumCarriersForGrooming = Integer.parseInt(line);
+                        maxReservedMiniGrids = Integer.parseInt(line);
                         break;
                     case 9:
 //                        SeedGenerator seedGenerator = new SecureRandomSeedGenerator();
@@ -112,7 +185,6 @@ public class SimulatorParameters {
 //                        } catch (SeedException e) {
 //                            e.printStackTrace();
 //                        }
-
                         while (line != null) {
                             line = line.replaceAll("\\s+", "");
                             byte[] seed = new BigInteger(line, 2).toByteArray();
@@ -137,35 +209,12 @@ public class SimulatorParameters {
         return listOfSeeds.get(seedCounter);
     }
 
-    /**
-     * Getters
-     */
     public static int getNumberOfTotalRequests() {
         return numberOfTotalRequests;
     }
 
     public static int get_runNumber() {
         return _runNumber;
-    }
-
-    public static int getNumberOfCarriers() {
-        return numberOfCarriers;
-    }
-
-    public static double getCarrierBandwidth() {
-        return carrierBandwidth;
-    }
-
-    public static boolean isGrooming() {
-        return isGrooming;
-    }
-
-    public static boolean isWidthGuardBands() {
-        return widthGuardBands;
-    }
-
-    public static int getMaxNumCarriersForGrooming() {
-        return maxNumCarriersForGrooming;
     }
 
 }

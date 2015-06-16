@@ -1,8 +1,5 @@
 package com.launcher;
 
-import com.algorithms.Algorithm;
-import com.algorithms.FF;
-
 import java.io.IOException;
 import java.util.Date;
 
@@ -12,14 +9,12 @@ import java.util.Date;
 public class Launcher {
 
     private static Date date;
-    private static Algorithm algorithm;
 
     public static void main(String[] args) throws IOException {
 
         date = new Date();
         SimulatorParameters.readConfigFile("config.txt");
 
-        algorithm = new FF();
         SimulatorParameters.startSimulation();
     }
 
@@ -27,7 +22,4 @@ public class Launcher {
         return date;
     }
 
-    public static Algorithm getAlgorithm() {
-        return algorithm;
-    }
 }

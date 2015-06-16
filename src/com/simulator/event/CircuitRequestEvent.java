@@ -1,11 +1,12 @@
 package com.simulator.event;
 
+import com.auxiliarygraph.AuxiliaryGraph;
 import com.filemanager.Results;
 import com.inputdata.elements.TrafficClass;
-import com.model.Generator;
-import com.model.elements.Connection;
-import com.model.elements.Flow;
 import com.simulator.Scheduler;
+import com.simulator.elements.Connection;
+import com.simulator.elements.Generator;
+import com.simulator.elements.TrafficFlow;
 import jsim.event.Entity;
 import jsim.event.Event;
 import org.slf4j.Logger;
@@ -54,13 +55,15 @@ public class CircuitRequestEvent extends Event {
             holdingTime = trafficClass.getHoldingTimeDistribution().execute();
 
         /** Get a random destination following a uniform distribution */
-        Flow selectedFlow = generator.getRandomFlow(trafficClass.getType());
+        TrafficFlow selectedFlow = generator.getRandomFlow(trafficClass.getType());
 
-        Connection connection = selectedFlow.setConnection(trafficClass.getBw(), holdingTime, isUnKnown);
+        /** Create a new Auxiliary Graph*/
+        Connection connection = null;
+        AuxiliaryGraph auxiliaryGraph = new AuxiliaryGraph(generator.getVertex().getVertexID(), selectedFlow.getDstNode().getVertexID(), (int) trafficClass.getBw());
 
         /**If connection is established, then, add release event*/
-        if (connection != null) {
-            Event event = new CircuitReleaseEvent(new Entity(holdingTime),generator,selectedFlow,connection);
+        if (auxiliaryGraph.runShortestPathAlgorithm(selectedFlow.getListOfPaths())) {
+            Event event = new CircuitReleaseEvent(new Entity(holdingTime), generator, selectedFlow, connection);
             Scheduler.schedule(event, holdingTime);
             log.debug("Added release event: " + generator.getVertex().getVertexID() + "-" + selectedFlow.getDstNode().getVertexID());
 //            Results.writeHoldingTime(generator,selectedFlow,trafficClass.getType(),isUnKnown,holdingTime);

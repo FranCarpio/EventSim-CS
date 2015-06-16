@@ -67,6 +67,18 @@ public class FiberLink {
         return isAvailable;
     }
 
+    public double getUtilization() {
+
+        double utilization = 0;
+
+        for (int i = 0; i < miniGrids.size(); i++) {
+
+
+        }
+
+        return utilization;
+    }
+
     public void setFreeMiniGrid(int id) {
         miniGrids.replace(id, miniGrids.get(id), 0);
     }

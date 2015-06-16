@@ -16,6 +16,7 @@ public class Path {
     private List<FiberLink> listOfFiberLinks;
 
     public Path(PathElement pathElement) {
+        this.pathElement = pathElement;
         listOfFiberLinks = new ArrayList<>();
         for (EdgeElement e : pathElement.getTraversedEdges())
             listOfFiberLinks.add(NetworkState.getFiberLinksMap().get(e.getEdgeID()));
