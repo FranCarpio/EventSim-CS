@@ -19,13 +19,17 @@ public class NetworkState {
     private static Map<String, FiberLink> fiberLinksMap;
     private static List<LightPath> listOfLightPaths;
     private static List<Path> listOfPaths;
+    private static int txCapacityOfTransponders;
+    private static int numOfMiniGridsPerGB;
 
-    public NetworkState(Gcontroller graph, int granularity, int spectrumWidth, Set<PathElement> setOfPathElements) {
+    public NetworkState(Gcontroller graph, int granularity, int spectrumWidth, int txCapacityOfTransponders, int numOfMiniGridsPerGB, Set<PathElement> setOfPathElements) {
 
         this.graph = graph;
         this.fiberLinksMap = new HashMap<>();
         this.listOfLightPaths = new ArrayList<>();
         this.listOfPaths = new ArrayList<>();
+        this.txCapacityOfTransponders = txCapacityOfTransponders / granularity;
+        this.numOfMiniGridsPerGB = numOfMiniGridsPerGB;
 
         for (PathElement pe : setOfPathElements)
             listOfPaths.add(new Path(pe));
@@ -72,5 +76,17 @@ public class NetworkState {
                 listOfCandidatePaths.add(p);
 
         return listOfCandidatePaths;
+    }
+
+    public static void setNewLightPath(LightPath lp) {
+        listOfLightPaths.add(lp);
+    }
+
+    public static int getTxCapacityOfTransponders() {
+        return txCapacityOfTransponders;
+    }
+
+    public static int getNumOfMiniGridsPerGB() {
+        return numOfMiniGridsPerGB;
     }
 }

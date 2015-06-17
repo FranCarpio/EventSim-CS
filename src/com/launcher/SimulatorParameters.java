@@ -7,6 +7,7 @@ import com.graph.graphcontroller.Gcontroller;
 import com.graph.path.PathElement;
 import com.graph.path.pathelementimpl.PathElementImpl;
 import com.inputdata.InputParameters;
+import com.inputdata.elements.Source;
 import com.inputdata.reader.ImportTopologyFromSNDFile;
 import com.inputdata.reader.ReadFile;
 import com.simulator.Scheduler;
@@ -48,7 +49,7 @@ public class SimulatorParameters {
         /** Input network from a SNDLib file */
         new InputParameters(networkFile);
         setGenerators();
-        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, setPaths(ImportTopologyFromSNDFile.getPaths()));
+        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, txCapacityOfTransponders, numOfMiniGridsPerGB,setPaths(ImportTopologyFromSNDFile.getPaths()));
         runSimulation();
     }
 
@@ -84,7 +85,8 @@ public class SimulatorParameters {
     public static void setGenerators() {
 
         listOfGenerators = new ArrayList<>();
-        listOfGenerators.addAll(InputParameters.getListOfSources().stream().map(node -> new Generator(node.getVertex(), node.getListOfTrafficDemands(), node.getArrivalRate(), node.getTrafficClassProb(), node.getDestinationProb())).collect(Collectors.toList()));
+        for(Source s:InputParameters.getListOfSources())
+            listOfGenerators.add(new Generator(s.getVertex(),s.getListOfTrafficDemands(),s.getArrivalRate(),s.getTrafficClassProb(),s.getDestinationProb()));
     }
 
     /**

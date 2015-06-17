@@ -5,9 +5,9 @@ network.txt
 # Max number of total request events before to stop the simulation
 100000
 # Number of simulations
-10
+1
 # Spectrum width (Ghz)
-1000
+25
 # g: grid granularity (Ghz)
 5
 # B: number of mini-grids consumed by a guard band

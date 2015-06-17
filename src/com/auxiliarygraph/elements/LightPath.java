@@ -41,4 +41,8 @@ public class LightPath {
 
         return canBeExpanded;
     }
+
+    public List<Integer> getMiniGridIds() {
+        return miniGridIds;
+    }
 }

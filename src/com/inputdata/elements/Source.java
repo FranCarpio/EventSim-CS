@@ -14,7 +14,7 @@ import java.util.List;
 public class Source {
 
     private VertexElement vertex;
-    private List<TrafficDemand> listOfTrafficDemands;
+    private List<TrafficDemand> listOfTrafficDemands = new ArrayList<>();
     private List<Double> trafficClassProb;
     private List<List<Double>> destinationProb;
     private double lambda;
@@ -30,7 +30,7 @@ public class Source {
      */
     public Source(VertexElement vertex, List<TrafficDemand> listOfTrafficDemands, int runNumber) {
         this.vertex = vertex;
-        this.listOfTrafficDemands = listOfTrafficDemands;
+        this.listOfTrafficDemands.addAll(listOfTrafficDemands);
         this.trafficClassProb = new ArrayList<>();
         this.destinationProb = new ArrayList<>();
         initializeRNGForArrivalProcess(runNumber);

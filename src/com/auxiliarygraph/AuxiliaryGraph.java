@@ -8,7 +8,9 @@ import com.auxiliarygraph.elements.Path;
 import com.graph.elements.edge.EdgeElement;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -18,16 +20,17 @@ public class AuxiliaryGraph {
 
     private List<SpectrumEdge> listOfSpectrumEdges;
     private List<LightPathEdge> listOfLightPathEdges;
-    private final int GUARD_BAND = 2;
+    private final int GUARD_BAND = NetworkState.getNumOfMiniGridsPerGB();
     private int bw;
+    private final double TRANSPONDER_EDGE_COST = 1e3;
 
     /**
      * Constructor class
      */
-    public AuxiliaryGraph(String src, String dst, int bw) {
+    public AuxiliaryGraph(String src, String dst, int b) {
         listOfSpectrumEdges = new ArrayList<>();
         listOfLightPathEdges = new ArrayList<>();
-        this.bw = bw;
+        this.bw = 8;
 
         /** Search for candidate paths between S and D*/
         List<Path> listOfCandidatePaths = NetworkState.getListOfPaths(src, dst);
@@ -50,32 +53,67 @@ public class AuxiliaryGraph {
 
         List<SpectrumEdge> selectedSpectrumEdges = new ArrayList<>();
         List<LightPathEdge> selectedLightPathEdges = new ArrayList<>();
+        double cost;
+        double minCost = Double.MAX_VALUE;
 
         /** For each possible path, calculate the costs*/
         for (Path path : listOfCandidatePaths)
-            for (EdgeElement edge : path.getPathElement().getTraversedEdges())
-                for (SpectrumEdge se : listOfSpectrumEdges)
-                    if (se.getEdgeElement().equals(edge)) {
+            for (EdgeElement edge : path.getPathElement().getTraversedEdges()) {
+                cost = 0;
+                for (int i = 0; i < bw; i++)
+                    for (SpectrumEdge se : getListOfSpectrumEdges(edge)) {
+                        cost += se.getCOST();
+                        selectedSpectrumEdges.add(se);
                     }
+                if (bw / NetworkState.getTxCapacityOfTransponders() == 0)
+                    cost += TRANSPONDER_EDGE_COST * 2;
+                else {
+                    cost += TRANSPONDER_EDGE_COST * 2 * bw / NetworkState.getTxCapacityOfTransponders();
+                }
+                for (LightPathEdge lpe : listOfLightPathEdges) {
+
+                }
+            }
 
         return true;
     }
 
     public void setConnection(int bandwidth, List<SpectrumEdge> selectedSpectrumEdges, List<LightPathEdge> selectedLightPathEdges) {
 
-
+        Set<LightPath> newLightPaths = new HashSet<>();
         /** If the path contains spectrum edges then establish new lightpath **/
         if (selectedSpectrumEdges.size() != 0)
-        /** Check how many continuous Spectrum edges are in the path and establish lightpath*/
             for (SpectrumEdge se : selectedSpectrumEdges) {
-//                NetworkState.getLightPathMap().put();
-                FiberLink fl = NetworkState.getFiberLinksMap().get(se.getEdgeElement());
-                fl.setUsedMiniGrid(se.getSpectrumLayerIndex());
+                // Create new lightpath
+//                newLightPaths.add(new LightPath());
+
             }
 
         /** If the path contains lightpath edges, then route the request by allocating more subcarriers*/
+        if (selectedLightPathEdges.size() != 0)
+            for (LightPathEdge lpe : selectedLightPathEdges) {
+                for (EdgeElement e : lpe.getLightPath().getPathElement().getTraversedEdges()) {
+
+                }
+            }
 
         /** Update network state*/
+        /** for each new light path, extend allocating more sub-carriers*/
+        for (LightPath lp : newLightPaths) {
+            for (EdgeElement e : lp.getPathElement().getTraversedEdges()) {
+                FiberLink fl = NetworkState.getFiberLinksMap().get(e);
+                fl.setUsedMiniGrid(lp.getMiniGridIds());
+            }
+        }
+    }
 
+    public List<SpectrumEdge> getListOfSpectrumEdges(EdgeElement e) {
+        List<SpectrumEdge> listOfSpectrumEdges = new ArrayList<>();
+
+        for (SpectrumEdge se : this.listOfSpectrumEdges)
+            if (se.getEdgeElement().equals(e))
+                listOfSpectrumEdges.add(se);
+
+        return listOfSpectrumEdges;
     }
 }

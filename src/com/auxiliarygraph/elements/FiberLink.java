@@ -26,7 +26,7 @@ public class FiberLink {
         this.edgeElement = edgeElement;
         miniGrids = new HashMap<>();
         totalNumberOfMiniGrids = spectrumWidth / granularity;
-        for (int i = 1; i == totalNumberOfMiniGrids; i++) {
+        for (int i = 1; i <= totalNumberOfMiniGrids; i++) {
             miniGrids.put(i, 0);
         }
     }
@@ -85,6 +85,11 @@ public class FiberLink {
 
     public void setUsedMiniGrid(int id) {
         miniGrids.replace(id, miniGrids.get(id), 1);
+    }
+
+    public void setUsedMiniGrid(List<Integer> ids) {
+        for(Integer id: ids)
+            miniGrids.replace(id, miniGrids.get(id), 1);
     }
 
     public void setReservedMiniGrid(int id) {

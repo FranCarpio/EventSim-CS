@@ -9,20 +9,16 @@ public class SpectrumEdge {
 
     private int spectrumLayerIndex;
     private EdgeElement edgeElement;
-    private final double COST = 1e-5 * spectrumLayerIndex;
-    private final double TRANSPONDER_EDGE_COST = 1e3;
+    private double cost;
 
     public SpectrumEdge(EdgeElement edgeElement, int spectrumLayerIndex) {
+        this.cost = 1e-5 * spectrumLayerIndex;
         this.edgeElement = edgeElement;
         this.spectrumLayerIndex = spectrumLayerIndex;
     }
 
     public double getCOST() {
-        return COST;
-    }
-
-    public double getTRANSPONDER_EDGE_COST() {
-        return TRANSPONDER_EDGE_COST;
+        return cost;
     }
 
     public int getSpectrumLayerIndex() {

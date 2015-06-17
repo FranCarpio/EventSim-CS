@@ -43,6 +43,7 @@ public class TrafficFlow {
      */
     public TrafficFlow(VertexElement dstNode) {
         this.dstNode = dstNode;
+        this.listOfPaths = new ArrayList<>();
         this.listOfCounters = new ArrayList<>();
         for (int i = 0; i < InputParameters.getNumberOfTrafficClasses(); i++)
             this.listOfCounters.add(new Counter(i));
