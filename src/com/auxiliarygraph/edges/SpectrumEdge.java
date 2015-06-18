@@ -7,6 +7,7 @@ import com.graph.elements.edge.EdgeElement;
  */
 public class SpectrumEdge {
 
+    private final int TYPE = 0;
     private int spectrumLayerIndex;
     private EdgeElement edgeElement;
     private double cost;
@@ -17,15 +18,15 @@ public class SpectrumEdge {
         this.spectrumLayerIndex = spectrumLayerIndex;
     }
 
-    public double getCOST() {
-        return cost;
-    }
-
     public int getSpectrumLayerIndex() {
         return spectrumLayerIndex;
     }
 
     public EdgeElement getEdgeElement() {
         return edgeElement;
+    }
+
+    public double getCost() {
+        return cost;
     }
 }

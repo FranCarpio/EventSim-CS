@@ -60,6 +60,16 @@ public class NetworkState {
         return lightPaths;
     }
 
+    public static PathElement getPathElement(String src, String dst) {
+
+        for (Path path : listOfPaths)
+            if (path.getPathElement().getSourceID().equals(src) && path.getPathElement().getDestinationID().equals(dst))
+                return path.getPathElement();
+
+        return null;
+
+    }
+
     public static FiberLink getFiberLink(String edgeID) {
         return fiberLinksMap.get(edgeID);
     }

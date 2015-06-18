@@ -7,7 +7,7 @@ network.txt
 # Number of simulations
 1
 # Spectrum width (Ghz)
-25
+50
 # g: grid granularity (Ghz)
 5
 # B: number of mini-grids consumed by a guard band

@@ -72,8 +72,6 @@ public class FiberLink {
         double utilization = 0;
 
         for (int i = 0; i < miniGrids.size(); i++) {
-
-
         }
 
         return utilization;

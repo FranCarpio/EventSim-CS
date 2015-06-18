@@ -4,6 +4,7 @@ import com.auxiliarygraph.NetworkState;
 import com.graph.elements.edge.EdgeElement;
 import com.graph.path.PathElement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,13 +15,21 @@ public class LightPath {
     private PathElement pathElement;
     private List<Integer> miniGridIds;
 
-    public LightPath(PathElement pathElement, List<Integer> miniGridIds) {
+    public LightPath(PathElement pathElement, int initialMiniGrid, int bw) {
         this.pathElement = pathElement;
-        this.miniGridIds = miniGridIds;
+        this.miniGridIds = new ArrayList<>();
+        for (int i = initialMiniGrid; i < initialMiniGrid + bw - 1; i++)
+            miniGridIds.add(i);
     }
 
     public PathElement getPathElement() {
         return pathElement;
+    }
+
+    public void expandLightPath(int bw) {
+        int firstFreeMiniGrid = miniGridIds.size();
+        for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw - 1; i++)
+            miniGridIds.add(i);
     }
 
     public void addMiniGrids(List<Integer> miniGridIds) {
@@ -40,6 +49,13 @@ public class LightPath {
                 canBeExpanded = false;
 
         return canBeExpanded;
+    }
+
+    public boolean containsMiniGrid(int miniGrid) {
+        for (Integer i : miniGridIds)
+            if (i.equals(miniGrid))
+                return true;
+        return false;
     }
 
     public List<Integer> getMiniGridIds() {

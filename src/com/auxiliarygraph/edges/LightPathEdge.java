@@ -5,7 +5,7 @@ import com.auxiliarygraph.elements.LightPath;
 /**
  * Created by Fran on 6/11/2015.
  */
-public class LightPathEdge {
+public class LightPathEdge{
 
     private final double COST;
     private LightPath lightPath;
@@ -19,7 +19,8 @@ public class LightPathEdge {
         return lightPath;
     }
 
-    public double getCOST() {
+    public double getCost() {
         return COST;
     }
+
 }
