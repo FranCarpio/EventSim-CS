@@ -88,6 +88,10 @@ public class NetworkState {
         return listOfCandidatePaths;
     }
 
+    public static List<LightPath> getListOfLightPaths() {
+        return listOfLightPaths;
+    }
+
     public static void setNewLightPath(LightPath lp) {
         listOfLightPaths.add(lp);
     }

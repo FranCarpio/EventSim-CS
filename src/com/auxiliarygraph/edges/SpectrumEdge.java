@@ -7,7 +7,6 @@ import com.graph.elements.edge.EdgeElement;
  */
 public class SpectrumEdge {
 
-    private final int TYPE = 0;
     private int spectrumLayerIndex;
     private EdgeElement edgeElement;
     private double cost;

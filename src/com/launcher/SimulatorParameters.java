@@ -120,19 +120,21 @@ public class SimulatorParameters {
 
             PathElement pathElement = new PathElementImpl(graph, graph.getVertex(listOfNodes.get(0)), graph.getVertex(listOfNodes.get(listOfNodes.size() - 1)), listOfIntermediateLinks);
 
-            for (Generator generator : listOfGenerators) {
-                if (!pathElement.getSource().getVertexID()
-                        .equals(generator.getVertex().getVertexID()))
-                    continue;
-                for (TrafficFlow f : generator.getListOfTrafficFlows()) {
-                    if (!pathElement.getDestination().getVertexID()
-                            .equals(f.getDstNode().getVertexID()))
-                        continue;
-                    setOfPathElements.add(pathElement);
-                    log.info("Path Element: " + pathElement.getVertexSequence());
-                    break;
-                }
-            }
+            setOfPathElements.add(pathElement);
+            log.info("Path Element: " + pathElement.getVertexSequence());
+//            for (Generator generator : listOfGenerators) {
+//                if (!pathElement.getSource().getVertexID()
+//                        .equals(generator.getVertex().getVertexID()))
+//                    continue;
+//                for (TrafficFlow f : generator.getListOfTrafficFlows()) {
+//                    if (!pathElement.getDestination().getVertexID()
+//                            .equals(f.getDstNode().getVertexID()))
+//                        continue;
+//                    setOfPathElements.add(pathElement);
+//                    log.info("Path Element: " + pathElement.getVertexSequence());
+//                    break;
+//                }
+//            }
         }
 
         return setOfPathElements;

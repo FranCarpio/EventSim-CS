@@ -117,13 +117,17 @@ public class AuxiliaryGraph {
         List<LightPathEdge> selectedLightPathEdges = new ArrayList<>();
         List<SpectrumEdge> selectedSpectrumEdges = new ArrayList<>();
 
+        LightPathEdge lpe;
+        SpectrumEdge se;
         for (EdgeElement e : path.getPathElement().getTraversedEdges()) {
-            selectedLightPathEdges.add(getLightPathEdge(e, miniGrid));
-            selectedSpectrumEdges.add(getSpectrumEdge(e, miniGrid));
+            if ((lpe = getLightPathEdge(e, miniGrid)) != null)
+                selectedLightPathEdges.add(lpe);
+            if ((se = getSpectrumEdge(e, miniGrid)) != null)
+                selectedSpectrumEdges.add(se);
         }
 
         /** If the path contains spectrum edges then establish new lightpath **/
-        if (selectedSpectrumEdges.size() != 0) {
+        if (selectedSpectrumEdges.size() > 1) {
             int srcIndex = 0;
             for (int i = 0; i < selectedSpectrumEdges.size() - 1; i++) {
                 if (selectedSpectrumEdges.get(i).getEdgeElement().getDestinationVertex().equals(selectedSpectrumEdges.get(i + 1).getEdgeElement().getSourceVertex()))
@@ -136,24 +140,27 @@ public class AuxiliaryGraph {
                     srcIndex = i;
                 }
             }
+        } else if (selectedSpectrumEdges.size() == 1) {
+            newLightPaths.add(new LightPath(
+                    NetworkState.getPathElement(selectedSpectrumEdges.get(0).getEdgeElement().getSourceVertex().getVertexID(),
+                            selectedSpectrumEdges.get(0).getEdgeElement().getDestinationVertex().getVertexID()),
+                    miniGrid, bwWithGB));
         }
 
         /** If the path contains lightpath edges, then route the request by allocating more subcarriers*/
-        if (selectedLightPathEdges.size() != 0)
-            for (LightPathEdge lpe : selectedLightPathEdges) {
-                for (EdgeElement e : lpe.getLightPath().getPathElement().getTraversedEdges()) {
-
-                }
-            }
+        if (!selectedLightPathEdges.isEmpty())
+            for (LightPathEdge lightPathEdge : selectedLightPathEdges)
+                    lightPathEdge.getLightPath().expandLightPath(bw);
 
         /** Update network state*/
         /** for each new light path, extend allocating more sub-carriers*/
         for (LightPath lp : newLightPaths) {
             for (EdgeElement e : lp.getPathElement().getTraversedEdges()) {
-                FiberLink fl = NetworkState.getFiberLinksMap().get(e);
+                FiberLink fl = NetworkState.getFiberLinksMap().get(e.getEdgeID());
                 fl.setUsedMiniGrid(lp.getMiniGridIds());
             }
         }
+        NetworkState.getListOfLightPaths().addAll(newLightPaths);
     }
 
     public List<SpectrumEdge> getListOfSpectrumEdges(EdgeElement e) {

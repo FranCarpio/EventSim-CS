@@ -18,7 +18,7 @@ public class LightPath {
     public LightPath(PathElement pathElement, int initialMiniGrid, int bw) {
         this.pathElement = pathElement;
         this.miniGridIds = new ArrayList<>();
-        for (int i = initialMiniGrid; i < initialMiniGrid + bw - 1; i++)
+        for (int i = initialMiniGrid; i < initialMiniGrid + bw; i++)
             miniGridIds.add(i);
     }
 
@@ -27,9 +27,12 @@ public class LightPath {
     }
 
     public void expandLightPath(int bw) {
-        int firstFreeMiniGrid = miniGridIds.size();
-        for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw - 1; i++)
+        int firstFreeMiniGrid = miniGridIds.size() + 1;
+        for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw; i++) {
             miniGridIds.add(i);
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
+        }
     }
 
     public void addMiniGrids(List<Integer> miniGridIds) {
