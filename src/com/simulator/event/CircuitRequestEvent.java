@@ -4,7 +4,6 @@ import com.auxiliarygraph.AuxiliaryGraph;
 import com.filemanager.Results;
 import com.inputdata.elements.TrafficClass;
 import com.simulator.Scheduler;
-import com.simulator.elements.Connection;
 import com.simulator.elements.Generator;
 import com.simulator.elements.TrafficFlow;
 import jsim.event.Entity;
@@ -58,12 +57,11 @@ public class CircuitRequestEvent extends Event {
         TrafficFlow selectedFlow = generator.getRandomFlow(trafficClass.getType());
 
         /** Create a new Auxiliary Graph*/
-        Connection connection = null;
-        AuxiliaryGraph auxiliaryGraph = new AuxiliaryGraph(generator.getVertex().getVertexID(), selectedFlow.getDstNode().getVertexID(), (int) trafficClass.getBw());
+        AuxiliaryGraph auxiliaryGraph = new AuxiliaryGraph(generator.getVertex().getVertexID(), selectedFlow.getDstNode().getVertexID(), (int) trafficClass.getBw(), Scheduler.currentTime(), holdingTime, isUnKnown);
 
-        /**If connection is established, then, add release event*/
+        /**If path is found, then add release event*/
         if (auxiliaryGraph.runShortestPathAlgorithm(selectedFlow.getListOfPaths())) {
-            Event event = new CircuitReleaseEvent(new Entity(holdingTime), generator, selectedFlow, connection);
+            Event event = new CircuitReleaseEvent(new Entity(holdingTime), generator, selectedFlow, auxiliaryGraph.getNewConnection());
             Scheduler.schedule(event, holdingTime);
             log.debug("Added release event: " + generator.getVertex().getVertexID() + "-" + selectedFlow.getDstNode().getVertexID());
 //            Results.writeHoldingTime(generator,selectedFlow,trafficClass.getType(),isUnKnown,holdingTime);

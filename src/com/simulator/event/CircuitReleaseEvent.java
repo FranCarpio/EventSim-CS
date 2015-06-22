@@ -1,6 +1,8 @@
 package com.simulator.event;
 
-import com.simulator.elements.Connection;
+import com.auxiliarygraph.NetworkState;
+import com.auxiliarygraph.elements.Connection;
+import com.auxiliarygraph.elements.LightPath;
 import com.simulator.elements.Generator;
 import com.simulator.elements.TrafficFlow;
 import jsim.event.Entity;
@@ -22,7 +24,7 @@ public class CircuitReleaseEvent extends Event {
     /**
      * Flow that remove its connection
      */
-    private TrafficFlow flow;
+    private TrafficFlow trafficFlow;
     /**
      * Connection to remove
      */
@@ -33,27 +35,30 @@ public class CircuitReleaseEvent extends Event {
     /**
      * Constructor class
      */
-    public CircuitReleaseEvent(Entity entity, Generator generator, TrafficFlow flow, Connection connectionToRelease) {
+    public CircuitReleaseEvent(Entity entity, Generator generator, TrafficFlow trafficFlow, Connection connectionToRelease) {
         super(entity);
         this.generator = generator;
-        this.flow = flow;
+        this.trafficFlow = trafficFlow;
         this.connectionToRelease = connectionToRelease;
     }
 
     @Override
     public void occur() {
 
+
         /** Look for the connection and remove it*/
-//        outerLoop:
-//        for (SpectrumPath sp : flow.getSetOfSpectrumPaths()) {
-//            for (Connection con : sp.getSetOfConnections())
-//                if (con.equals(connectionToRelease)) {
-//                    sp.removeConnection(connectionToRelease);
-//                    if (sp.getSetOfConnections().size() == 0)
-//                        flow.getSetOfSpectrumPaths().remove(sp);
-//                    log.debug("Connection released: " + generator.getVertex().getVertexID() + "-" + flow.getDstNode().getVertexID());
-//                    break outerLoop;
-//                }
-//        }
+        for (int i = 0; i < NetworkState.getListOfLightPaths().size(); i++) {
+            LightPath lp = NetworkState.getListOfLightPaths().get(i);
+            if (lp.getConnectionMap().containsKey(connectionToRelease.getStartingTime())) {
+                lp.removeConnection(connectionToRelease);
+                if (lp.getConnectionMap().isEmpty()) {
+                    /**remove guard bands and delete light path*/
+                    lp.releaseAllMiniGrids();
+                    NetworkState.getListOfLightPaths().remove(i);
+                    i--;
+                }
+                log.info("Connection released: " + generator.getVertex().getVertexID() + "-" + trafficFlow.getDstNode().getVertexID());
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.simulator.elements;
+package com.auxiliarygraph.elements;
 
 import com.simulator.Scheduler;
 import org.slf4j.Logger;

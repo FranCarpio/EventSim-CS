@@ -2,6 +2,7 @@ package com.auxiliarygraph;
 
 import com.auxiliarygraph.edges.LightPathEdge;
 import com.auxiliarygraph.edges.SpectrumEdge;
+import com.auxiliarygraph.elements.Connection;
 import com.auxiliarygraph.elements.FiberLink;
 import com.auxiliarygraph.elements.LightPath;
 import com.auxiliarygraph.elements.Path;
@@ -24,15 +25,22 @@ public class AuxiliaryGraph {
     private int bwWithGB;
     private int bw;
     private final double TRANSPONDER_EDGE_COST = 1e3;
+    private Connection newConnection;
+    private double currentTime;
+    private double ht;
+    private boolean feature;
 
     /**
      * Constructor class
      */
-    public AuxiliaryGraph(String src, String dst, int b) {
+    public AuxiliaryGraph(String src, String dst, int b, double currentTime, double ht, boolean feature) {
         listOfLPE = new ArrayList<>();
         listOfSE = new ArrayList<>();
         this.bw = 1;
         this.bwWithGB = bw + 2 * GUARD_BAND;
+        this.currentTime = currentTime;
+        this.ht = ht;
+        this.feature = feature;
 
         /** Search for candidate paths between S and D*/
         List<Path> listOfCandidatePaths = NetworkState.getListOfPaths(src, dst);
@@ -117,6 +125,8 @@ public class AuxiliaryGraph {
         List<LightPathEdge> selectedLightPathEdges = new ArrayList<>();
         List<SpectrumEdge> selectedSpectrumEdges = new ArrayList<>();
 
+        newConnection = new Connection(currentTime, ht, bw, feature);
+
         LightPathEdge lpe;
         SpectrumEdge se;
         for (EdgeElement e : path.getPathElement().getTraversedEdges()) {
@@ -136,7 +146,7 @@ public class AuxiliaryGraph {
                     newLightPaths.add(new LightPath(
                             NetworkState.getPathElement(selectedSpectrumEdges.get(srcIndex).getEdgeElement().getSourceVertex().getVertexID(),
                                     selectedSpectrumEdges.get(i).getEdgeElement().getDestinationVertex().getVertexID()),
-                            miniGrid, bwWithGB));
+                            miniGrid, bwWithGB, newConnection));
                     srcIndex = i;
                 }
             }
@@ -144,13 +154,15 @@ public class AuxiliaryGraph {
             newLightPaths.add(new LightPath(
                     NetworkState.getPathElement(selectedSpectrumEdges.get(0).getEdgeElement().getSourceVertex().getVertexID(),
                             selectedSpectrumEdges.get(0).getEdgeElement().getDestinationVertex().getVertexID()),
-                    miniGrid, bwWithGB));
+                    miniGrid, bwWithGB, newConnection));
         }
 
         /** If the path contains lightpath edges, then route the request by allocating more subcarriers*/
         if (!selectedLightPathEdges.isEmpty())
-            for (LightPathEdge lightPathEdge : selectedLightPathEdges)
-                    lightPathEdge.getLightPath().expandLightPath(bw);
+            for (LightPathEdge lightPathEdge : selectedLightPathEdges) {
+                lightPathEdge.getLightPath().expandLightPath(bw);
+                lightPathEdge.getLightPath().addNewConnection(newConnection);
+            }
 
         /** Update network state*/
         /** for each new light path, extend allocating more sub-carriers*/
@@ -191,5 +203,9 @@ public class AuxiliaryGraph {
         }
 
         return null;
+    }
+
+    public Connection getNewConnection() {
+        return newConnection;
     }
 }

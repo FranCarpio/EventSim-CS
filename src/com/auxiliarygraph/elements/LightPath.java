@@ -5,7 +5,9 @@ import com.graph.elements.edge.EdgeElement;
 import com.graph.path.PathElement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Fran on 6/11/2015.
@@ -14,12 +16,15 @@ public class LightPath {
 
     private PathElement pathElement;
     private List<Integer> miniGridIds;
+    private Map<Double, Connection> connectionMap;
 
-    public LightPath(PathElement pathElement, int initialMiniGrid, int bw) {
+    public LightPath(PathElement pathElement, int initialMiniGrid, int bw, Connection connection) {
         this.pathElement = pathElement;
         this.miniGridIds = new ArrayList<>();
+        this.connectionMap = new HashMap<>();
         for (int i = initialMiniGrid; i < initialMiniGrid + bw; i++)
             miniGridIds.add(i);
+        connectionMap.put(connection.getStartingTime(), connection);
     }
 
     public PathElement getPathElement() {
@@ -35,20 +40,11 @@ public class LightPath {
         }
     }
 
-    public void addMiniGrids(List<Integer> miniGridIds) {
-        this.miniGridIds.addAll(miniGridIds);
-    }
-
-    public void removeMiniGrids(List<Integer> miniGridIds) {
-        for (Integer i : miniGridIds)
-            this.miniGridIds.remove(i);
-    }
-
     public boolean canBeExpanded(int n) {
         boolean canBeExpanded = true;
 
         for (EdgeElement e : pathElement.getTraversedEdges())
-            if (!NetworkState.getFiberLink(e.getEdgeID()).areMiniGridsAvailable(miniGridIds.get(miniGridIds.size() - 1) + 1, n))
+            if (!NetworkState.getFiberLink(e.getEdgeID()).areMiniGridsAvailable(miniGridIds.get(miniGridIds.size() - 1), n))
                 canBeExpanded = false;
 
         return canBeExpanded;
@@ -61,7 +57,30 @@ public class LightPath {
         return false;
     }
 
+    public void addNewConnection(Connection connection) {
+        connectionMap.put(connection.getStartingTime(), connection);
+    }
+
+    public void removeConnection(Connection connection) {
+        connectionMap.remove(connection.getStartingTime());
+        for (int i = 0; i < connection.getBw(); i++) {
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(miniGridIds.size() - 1));
+            miniGridIds.remove(miniGridIds.size() - 1);
+        }
+    }
+
+    public Map<Double, Connection> getConnectionMap() {
+        return connectionMap;
+    }
+
     public List<Integer> getMiniGridIds() {
         return miniGridIds;
+    }
+
+    public void releaseAllMiniGrids() {
+        for (EdgeElement e : pathElement.getTraversedEdges())
+            for (Integer i : miniGridIds)
+                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
     }
 }
