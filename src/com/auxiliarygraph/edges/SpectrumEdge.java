@@ -13,6 +13,7 @@ public class SpectrumEdge {
 
     public SpectrumEdge(EdgeElement edgeElement, int spectrumLayerIndex) {
         this.cost = 1e-5 * spectrumLayerIndex;
+//        this.cost = 1 + 1e-5 * spectrumLayerIndex;
         this.edgeElement = edgeElement;
         this.spectrumLayerIndex = spectrumLayerIndex;
     }

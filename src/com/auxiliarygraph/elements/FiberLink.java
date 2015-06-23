@@ -69,12 +69,13 @@ public class FiberLink {
 
     public double getUtilization() {
 
-        double utilization = 0;
+        int usedMiniGrids = 0;
 
-        for (int i = 0; i < miniGrids.size(); i++) {
-        }
+        for (Map.Entry<Integer, Integer> entry : miniGrids.entrySet())
+            if (entry.getValue() == 1)
+                usedMiniGrids++;
 
-        return utilization;
+        return (double) usedMiniGrids / miniGrids.size();
     }
 
     public void setFreeMiniGrid(int id) {
@@ -86,7 +87,7 @@ public class FiberLink {
     }
 
     public void setUsedMiniGrid(List<Integer> ids) {
-        for(Integer id: ids)
+        for (Integer id : ids)
             miniGrids.replace(id, miniGrids.get(id), 1);
     }
 

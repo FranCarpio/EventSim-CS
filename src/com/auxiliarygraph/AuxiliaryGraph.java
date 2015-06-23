@@ -25,6 +25,7 @@ public class AuxiliaryGraph {
     private int bwWithGB;
     private int bw;
     private final double TRANSPONDER_EDGE_COST = 1e3;
+    //    private final double TRANSPONDER_EDGE_COST = 0;
     private Connection newConnection;
     private double currentTime;
     private double ht;
@@ -36,7 +37,7 @@ public class AuxiliaryGraph {
     public AuxiliaryGraph(String src, String dst, int b, double currentTime, double ht, boolean feature) {
         listOfLPE = new ArrayList<>();
         listOfSE = new ArrayList<>();
-        this.bw = 1;
+        this.bw = b;
         this.bwWithGB = bw + 2 * GUARD_BAND;
         this.currentTime = currentTime;
         this.ht = ht;
@@ -99,8 +100,17 @@ public class AuxiliaryGraph {
                 layerCost += lpe.getCost();
             } else if ((se = getSpectrumEdge(e, miniGrid)) != null) {
                 if (getSpectrumEdge(e, miniGrid + bwWithGB - 1) != null) {
-                    for (int i = miniGrid; i < miniGrid + bwWithGB; i++)
+                    for (int i = miniGrid; i < miniGrid + bwWithGB; i++) {
+                        /**
+                         *
+                         */
+//                        if (getSpectrumEdge(e, i) == null)
+//                            System.out.println();
+                        /**
+                         *
+                         */
                         layerCost += getSpectrumEdge(e, i).getCost();
+                    }
                     if (bwWithGB / NetworkState.getTxCapacityOfTransponders() == 0)
                         layerCost += TRANSPONDER_EDGE_COST * 2;
                     else {
