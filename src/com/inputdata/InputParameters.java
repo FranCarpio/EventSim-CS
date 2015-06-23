@@ -21,7 +21,7 @@ import java.util.Set;
 public class InputParameters {
 
     private static Gcontroller graph;
-    private static List<TrafficClass> listOfTrafficClasses = new ArrayList<>();
+    private static List<TrafficClass> listOfTrafficClasses;
     private static double arrivalCoefficient;
     private static String arrivalProcess;
     private static List<TrafficDemand> listOfTrafficDemands;
@@ -43,16 +43,17 @@ public class InputParameters {
         setTrafficDemands();
 
         /** Read network input data*/
-        readNetworkParameters();
+//        readNetworkParameters();
 
         /** Set nodes */
-        setNodes(0);
+//        setNodes(0);
     }
 
     /**
      * Read the input parameters
      */
     public static void readNetworkParameters() {
+        listOfTrafficClasses = new ArrayList<>();
         List<String> parameters = ImportTopologyFromSNDFile.getParameters();
         String[] arrivalProcessArray = parameters.get(0).trim().split("-");
         arrivalProcess = arrivalProcessArray[0];

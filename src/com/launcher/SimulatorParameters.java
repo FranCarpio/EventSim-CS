@@ -12,14 +12,12 @@ import com.inputdata.reader.ImportTopologyFromSNDFile;
 import com.inputdata.reader.ReadFile;
 import com.simulator.Scheduler;
 import com.simulator.elements.Generator;
-import com.simulator.elements.TrafficFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by Fran on 4/16/2015.
@@ -32,7 +30,7 @@ public class SimulatorParameters {
     private static int numberOfRuns;
     private static int _runNumber = -1;
     private static List<byte[]> listOfSeeds;
-    private static int seedCounter = -1;
+    private static int seedCounter;
     private static int spectrumWidth;
     private static int gridGranularity;
     private static int numOfMiniGridsPerGB;
@@ -48,8 +46,8 @@ public class SimulatorParameters {
 
         /** Input network from a SNDLib file */
         new InputParameters(networkFile);
-        setGenerators();
-        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, txCapacityOfTransponders, numOfMiniGridsPerGB,setPaths(ImportTopologyFromSNDFile.getPaths()));
+//        setGenerators();
+        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
         runSimulation();
     }
 
@@ -57,6 +55,8 @@ public class SimulatorParameters {
      * Function to run a simulation initializing the event handler and network inputdata
      */
     public static void runSimulation() {
+
+        seedCounter = -1;
 
         if (_runNumber == numberOfRuns - 1) {
             System.exit(0);
@@ -71,22 +71,16 @@ public class SimulatorParameters {
         /** Create new result files*/
         new Results();
 
+        InputParameters.readNetworkParameters();
         InputParameters.setNodes(SimulatorParameters.get_runNumber());
-        setGenerators();
+        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
+        listOfGenerators = new ArrayList<>();
+        for (Source s : InputParameters.getListOfSources())
+            listOfGenerators.add(new Generator(s.getVertex(), s.getListOfTrafficDemands(), s.getArrivalRate(), s.getTrafficClassProb(), s.getDestinationProb()));
         listOfGenerators.forEach(Generator::initialize);
 
         /** Run the simulation */
         Scheduler.startSim();
-    }
-
-    /**
-     * Function to set the generators
-     */
-    public static void setGenerators() {
-
-        listOfGenerators = new ArrayList<>();
-        for(Source s:InputParameters.getListOfSources())
-            listOfGenerators.add(new Generator(s.getVertex(),s.getListOfTrafficDemands(),s.getArrivalRate(),s.getTrafficClassProb(),s.getDestinationProb()));
     }
 
     /**
@@ -122,19 +116,6 @@ public class SimulatorParameters {
 
             setOfPathElements.add(pathElement);
             log.info("Path Element: " + pathElement.getVertexSequence());
-//            for (Generator generator : listOfGenerators) {
-//                if (!pathElement.getSource().getVertexID()
-//                        .equals(generator.getVertex().getVertexID()))
-//                    continue;
-//                for (TrafficFlow f : generator.getListOfTrafficFlows()) {
-//                    if (!pathElement.getDestination().getVertexID()
-//                            .equals(f.getDstNode().getVertexID()))
-//                        continue;
-//                    setOfPathElements.add(pathElement);
-//                    log.info("Path Element: " + pathElement.getVertexSequence());
-//                    break;
-//                }
-//            }
         }
 
         return setOfPathElements;

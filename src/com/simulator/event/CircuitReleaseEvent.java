@@ -57,7 +57,7 @@ public class CircuitReleaseEvent extends Event {
                     NetworkState.getListOfLightPaths().remove(i);
                     i--;
                 }
-                log.info("Connection released: " + generator.getVertex().getVertexID() + "-" + trafficFlow.getDstNode().getVertexID());
+                log.debug("Connection released: " + generator.getVertex().getVertexID() + "-" + trafficFlow.getDstNode().getVertexID());
             }
         }
     }

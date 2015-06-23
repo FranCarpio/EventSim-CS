@@ -182,7 +182,7 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
                     if (count == 6)
                         break;
                 }
-                demands.get(i).add(temp1[2] + "-" + temp1[3] + "-" + temp1[5]);
+                demands.get(i).add(temp1[1] + "-" + temp1[2] + "-" + temp1[4]);
             }
         }
 

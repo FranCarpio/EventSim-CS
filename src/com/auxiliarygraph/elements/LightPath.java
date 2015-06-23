@@ -81,6 +81,6 @@ public class LightPath {
     public void releaseAllMiniGrids() {
         for (EdgeElement e : pathElement.getTraversedEdges())
             for (Integer i : miniGridIds)
-                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
+                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(i);
     }
 }
