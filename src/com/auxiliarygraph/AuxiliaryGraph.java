@@ -37,7 +37,7 @@ public class AuxiliaryGraph {
     public AuxiliaryGraph(String src, String dst, int b, double currentTime, double ht, boolean feature) {
         listOfLPE = new ArrayList<>();
         listOfSE = new ArrayList<>();
-        this.bw = b;
+        this.bw = 1;
         this.bwWithGB = bw + 2 * GUARD_BAND;
         this.currentTime = currentTime;
         this.ht = ht;
@@ -98,17 +98,9 @@ public class AuxiliaryGraph {
         for (EdgeElement e : p.getPathElement().getTraversedEdges()) {
             if ((lpe = getLightPathEdge(e, miniGrid)) != null) {
                 layerCost += lpe.getCost();
-            } else if ((se = getSpectrumEdge(e, miniGrid)) != null) {
+            } else if (getNumberOfSpectrumEdges(e, miniGrid) == bwWithGB) {
                 if (getSpectrumEdge(e, miniGrid + bwWithGB - 1) != null) {
                     for (int i = miniGrid; i < miniGrid + bwWithGB; i++) {
-                        /**
-                         *
-                         */
-//                        if (getSpectrumEdge(e, i) == null)
-//                            System.out.println();
-                        /**
-                         *
-                         */
                         layerCost += getSpectrumEdge(e, i).getCost();
                     }
                     if (bwWithGB / NetworkState.getTxCapacityOfTransponders() == 0)
@@ -149,8 +141,13 @@ public class AuxiliaryGraph {
         /** If the path contains spectrum edges then establish new lightpath **/
         if (selectedSpectrumEdges.size() > 1) {
             int srcIndex = 0;
-            for (int i = 0; i < selectedSpectrumEdges.size() - 1; i++) {
-                if (selectedSpectrumEdges.get(i).getEdgeElement().getDestinationVertex().equals(selectedSpectrumEdges.get(i + 1).getEdgeElement().getSourceVertex()))
+            for (int i = 1; i < selectedSpectrumEdges.size(); i++) {
+                if (i == selectedSpectrumEdges.size() - 1) {
+                    newLightPaths.add(new LightPath(
+                            NetworkState.getPathElement(selectedSpectrumEdges.get(srcIndex).getEdgeElement().getSourceVertex().getVertexID(),
+                                    selectedSpectrumEdges.get(i).getEdgeElement().getDestinationVertex().getVertexID()),
+                            miniGrid, bwWithGB, newConnection));
+                } else if (selectedSpectrumEdges.get(i).getEdgeElement().getSourceVertex().equals(selectedSpectrumEdges.get(i - 1).getEdgeElement().getDestinationVertex()))
                     continue;
                 else {
                     newLightPaths.add(new LightPath(
@@ -185,14 +182,12 @@ public class AuxiliaryGraph {
         NetworkState.getListOfLightPaths().addAll(newLightPaths);
     }
 
-    public List<SpectrumEdge> getListOfSpectrumEdges(EdgeElement e) {
-        List<SpectrumEdge> listOfSpectrumEdges = new ArrayList<>();
-
-        for (SpectrumEdge se : this.listOfSE)
-            if (se.getEdgeElement().equals(e))
-                listOfSpectrumEdges.add(se);
-
-        return listOfSpectrumEdges;
+    public int getNumberOfSpectrumEdges(EdgeElement e, int spectrumLayerIndex) {
+        int counter = 0;
+        for (int i = spectrumLayerIndex; i < spectrumLayerIndex + bwWithGB; i++)
+            if (getSpectrumEdge(e, i) != null)
+                counter++;
+        return counter;
     }
 
     public SpectrumEdge getSpectrumEdge(EdgeElement e, int spectrumLayerIndex) {

@@ -44,7 +44,7 @@ public class NetworkState {
         for (Path p : listOfCandidatePaths) {
             List<VertexElement> vertexElements = p.getPathElement().getTraversedVertices();
             for (int i = 0; i < vertexElements.size() - 1; i++)
-                for (int j = 1; j < vertexElements.size() - 1; j++)
+                for (int j = i + 1; j < vertexElements.size(); j++)
                     listOfLightPaths.addAll(getListOfLightPaths(vertexElements.get(i), vertexElements.get(j)));
         }
         return listOfLightPaths;
@@ -90,10 +90,6 @@ public class NetworkState {
 
     public static List<LightPath> getListOfLightPaths() {
         return listOfLightPaths;
-    }
-
-    public static void setNewLightPath(LightPath lp) {
-        listOfLightPaths.add(lp);
     }
 
     public static int getTxCapacityOfTransponders() {

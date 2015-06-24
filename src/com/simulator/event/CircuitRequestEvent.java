@@ -46,12 +46,11 @@ public class CircuitRequestEvent extends Event {
         double holdingTime;
         boolean isUnKnown = generator.getRandomUnknown(trafficClass.getType());
 
+        holdingTime = trafficClass.getHoldingTimeDistribution().execute();
+
         /** If it is unknown, get the mean holding time*/
-        if (isUnKnown)
-            holdingTime = trafficClass.getMeanHoldingTime();
-        /** If not, generate random holding time from distribution */
-        else
-            holdingTime = trafficClass.getHoldingTimeDistribution().execute();
+//        if (isUnKnown)
+//            holdingTime = trafficClass.getMeanHoldingTime();
 
         /** Get a random destination following a uniform distribution */
         TrafficFlow selectedFlow = generator.getRandomFlow(trafficClass.getType());
@@ -64,7 +63,7 @@ public class CircuitRequestEvent extends Event {
             Event event = new CircuitReleaseEvent(new Entity(holdingTime), generator, selectedFlow, auxiliaryGraph.getNewConnection());
             Scheduler.schedule(event, holdingTime);
             log.debug("Added release event: " + generator.getVertex().getVertexID() + "-" + selectedFlow.getDstNode().getVertexID());
-//            Results.writeHoldingTime(generator,selectedFlow,trafficClass.getType(),isUnKnown,holdingTime);
+            Results.writeHoldingTime(generator,selectedFlow,trafficClass.getType(),isUnKnown,holdingTime);
         } else { /**if not, increase blocking counter*/
             selectedFlow.increaseBlockingCounter(trafficClass.getType(), isUnKnown);
             log.debug("Connection is blocked");
@@ -84,6 +83,6 @@ public class CircuitRequestEvent extends Event {
         Event event = new CircuitRequestEvent(new Entity(nextInterArrivalTime), generator, nextTrafficClass);
         Scheduler.schedule(event, nextInterArrivalTime);
         log.debug("Added request event: " + generator.getVertex().getVertexID() + "-" + selectedFlow.getDstNode().getVertexID());
-//        Results.writeInterArrivalTime(generator, selectedFlow,trafficClass.getType(),nextInterArrivalTime);
+        Results.writeInterArrivalTime(generator, selectedFlow,trafficClass.getType(),nextInterArrivalTime);
     }
 }

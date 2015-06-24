@@ -16,7 +16,8 @@ public class FiberLink {
      * Map<Integer, Integer> miniGrids
      * id, 0 ==> free
      * id, 1 ==> used
-     * id, 2 ==> reserved
+     * id, 2 ==> guard band
+     * id, 3 ==> reserved
      */
     private Map<Integer, Integer> miniGrids;
     private EdgeElement edgeElement;
@@ -61,9 +62,14 @@ public class FiberLink {
 
     public boolean areMiniGridsAvailable(int startingPoint, int n) {
         boolean isAvailable = true;
-        for (int i = startingPoint; i < startingPoint + n; i++)
+        for (int i = startingPoint + 1; i < startingPoint + 1 + n; i++) {
+            if (!miniGrids.containsKey(i)) {
+                isAvailable = false;
+                break;
+            }
             if (miniGrids.get(i) == 1)
                 isAvailable = false;
+        }
         return isAvailable;
     }
 
