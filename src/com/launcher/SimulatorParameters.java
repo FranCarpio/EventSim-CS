@@ -69,7 +69,7 @@ public class SimulatorParameters {
         new Scheduler();
 
         /** Create new result files*/
-//        new Results();
+        new Results();
 
         InputParameters.readNetworkParameters();
         InputParameters.setNodes(SimulatorParameters.get_runNumber());

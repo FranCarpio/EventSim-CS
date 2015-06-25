@@ -78,8 +78,7 @@ public class Results {
 
         linkRequestCounter++;
         if (linkRequestCounter >= 1000) {
-            for (Map.Entry<String, FiberLink> entry : NetworkState.getFiberLinksMap().entrySet()) {
-                double utilization = entry.getValue().getUtilization();
+            for (Map.Entry<String, FiberLink> entry : NetworkState.getFiberLinksMap().entrySet())
                 linkUtilizationWriteFile.write(entry.getValue().getEdgeElement().getSourceVertex().getVertexID()
                         .substring(1)
                         + " "
@@ -89,9 +88,10 @@ public class Results {
                         + "	"
                         + Scheduler.currentTime()
                         + "	"
-                        + utilization
+                        + entry.getValue().getNetUtilization()
+                        + "	"
+                        + entry.getValue().getUtilization()
                         + "\n");
-            }
 
             linkRequestCounter = 0;
         }

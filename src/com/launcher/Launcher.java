@@ -13,7 +13,7 @@ public class Launcher {
     public static void main(String[] args) throws IOException {
 
         date = new Date();
-        SimulatorParameters.readConfigFile("config.txt");
+        SimulatorParameters.readConfigFile("nsf-config.txt");
 
         SimulatorParameters.startSimulation();
     }

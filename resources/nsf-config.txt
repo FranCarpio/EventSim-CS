@@ -3,9 +3,9 @@ nsf-network.txt
 # Simulation time
 1000000000
 # Max number of total request events before to stop the simulation
-100000
+1000000
 # Number of simulations
-3
+1
 # Spectrum width (Ghz)
 1000
 # g: grid granularity (Ghz)

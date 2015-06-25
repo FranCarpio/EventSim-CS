@@ -78,6 +78,17 @@ public class FiberLink {
         int usedMiniGrids = 0;
 
         for (Map.Entry<Integer, Integer> entry : miniGrids.entrySet())
+            if (entry.getValue() == 1 || entry.getValue() == 2)
+                usedMiniGrids++;
+
+        return (double) usedMiniGrids / miniGrids.size();
+    }
+
+    public double getNetUtilization() {
+
+        int usedMiniGrids = 0;
+
+        for (Map.Entry<Integer, Integer> entry : miniGrids.entrySet())
             if (entry.getValue() == 1)
                 usedMiniGrids++;
 
@@ -92,13 +103,12 @@ public class FiberLink {
         miniGrids.replace(id, miniGrids.get(id), 1);
     }
 
-    public void setUsedMiniGrid(List<Integer> ids) {
-        for (Integer id : ids)
-            miniGrids.replace(id, miniGrids.get(id), 1);
+    public void setGuardBandMiniGrid(int id) {
+        miniGrids.replace(id, miniGrids.get(id), 2);
     }
 
     public void setReservedMiniGrid(int id) {
-        miniGrids.replace(id, miniGrids.get(id), 2);
+        miniGrids.replace(id, miniGrids.get(id), 3);
     }
 
     public int getTotalNumberOfMiniGrids() {

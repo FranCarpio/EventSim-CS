@@ -18,26 +18,36 @@ public class LightPath {
     private List<Integer> miniGridIds;
     private Map<Double, Connection> connectionMap;
 
-    public LightPath(PathElement pathElement, int initialMiniGrid, int bw, Connection connection) {
+    public LightPath(PathElement pathElement, int initialMiniGrid, int bwWithGB, int bw, Connection connection) {
         this.pathElement = pathElement;
         this.miniGridIds = new ArrayList<>();
         this.connectionMap = new HashMap<>();
-        for (int i = initialMiniGrid; i < initialMiniGrid + bw; i++)
+
+        for (int i = initialMiniGrid; i < initialMiniGrid + bwWithGB; i++)
             miniGridIds.add(i);
+
         connectionMap.put(connection.getStartingTime(), connection);
+
+        for (EdgeElement e : pathElement.getTraversedEdges()) {
+            for (int i = 0; i < bw; i++)
+                NetworkState.getFiberLinksMap().get(e.getEdgeID()).setUsedMiniGrid(miniGridIds.get(i));
+            for (int i = bw; i < bwWithGB; i++)
+                NetworkState.getFiberLinksMap().get(e.getEdgeID()).setGuardBandMiniGrid(miniGridIds.get(i));
+        }
     }
 
     public PathElement getPathElement() {
         return pathElement;
     }
 
-    public void expandLightPath(int bw) {
+    public void expandLightPath(int bw, Connection connection) {
         int firstFreeMiniGrid = miniGridIds.size() + 1;
         for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw; i++) {
             miniGridIds.add(i);
             for (EdgeElement e : pathElement.getTraversedEdges())
                 NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
         }
+        connectionMap.put(connection.getStartingTime(), connection);
     }
 
     public boolean canBeExpanded(int n) {
@@ -57,10 +67,6 @@ public class LightPath {
         return false;
     }
 
-    public void addNewConnection(Connection connection) {
-        connectionMap.put(connection.getStartingTime(), connection);
-    }
-
     public void removeConnection(Connection connection) {
         connectionMap.remove(connection.getStartingTime());
         for (int i = 0; i < connection.getBw(); i++) {
@@ -72,10 +78,6 @@ public class LightPath {
 
     public Map<Double, Connection> getConnectionMap() {
         return connectionMap;
-    }
-
-    public List<Integer> getMiniGridIds() {
-        return miniGridIds;
     }
 
     public void releaseAllMiniGrids() {

@@ -3,7 +3,6 @@ package com.auxiliarygraph;
 import com.auxiliarygraph.edges.LightPathEdge;
 import com.auxiliarygraph.edges.SpectrumEdge;
 import com.auxiliarygraph.elements.Connection;
-import com.auxiliarygraph.elements.FiberLink;
 import com.auxiliarygraph.elements.LightPath;
 import com.auxiliarygraph.elements.Path;
 import com.graph.elements.edge.EdgeElement;
@@ -62,6 +61,18 @@ public class AuxiliaryGraph {
                 listOfLPE.add(new LightPathEdge(lp));
     }
 
+    public double addTransponderCost() {
+        double transponderCost = 0;
+
+        if (bwWithGB / NetworkState.getTxCapacityOfTransponders() == 0)
+            transponderCost += TRANSPONDER_EDGE_COST * 2;
+        else {
+            transponderCost += TRANSPONDER_EDGE_COST * 2 * bwWithGB / NetworkState.getTxCapacityOfTransponders();
+        }
+
+        return transponderCost;
+    }
+
 
     public boolean runShortestPathAlgorithm(List<Path> listOfCandidatePaths) {
 
@@ -91,32 +102,51 @@ public class AuxiliaryGraph {
     }
 
     public double calculateTheCostForMiniGrid(Path p, int miniGrid) {
-        double layerCost = 0;
-        LightPathEdge lpe;
-        SpectrumEdge se;
 
-        for (EdgeElement e : p.getPathElement().getTraversedEdges()) {
-            if ((lpe = getLightPathEdge(e, miniGrid)) != null) {
-                layerCost += lpe.getCost();
-            } else if (getNumberOfSpectrumEdges(e, miniGrid) == bwWithGB) {
-                if (getSpectrumEdge(e, miniGrid + bwWithGB - 1) != null) {
-                    for (int i = miniGrid; i < miniGrid + bwWithGB; i++) {
+        double layerCost = 0;
+        List<SpectrumEdge> listOfSpectrumEdges = new ArrayList<>();
+        SpectrumEdge se;
+        List<LightPathEdge> listLightPathEdges = getLightPathEdges(miniGrid);
+        for (LightPathEdge lpe : listLightPathEdges)
+            layerCost += lpe.getCost();
+
+        for (EdgeElement e : p.getPathElement().getTraversedEdges())
+            if (getNumberOfSpectrumEdges(e, miniGrid) == bwWithGB)
+                if ((se = getSpectrumEdge(e, miniGrid + bwWithGB - 1)) != null) {
+                    listOfSpectrumEdges.add(se);
+                    for (int i = miniGrid; i < miniGrid + bwWithGB; i++)
                         layerCost += getSpectrumEdge(e, i).getCost();
-                    }
-                    if (bwWithGB / NetworkState.getTxCapacityOfTransponders() == 0)
-                        layerCost += TRANSPONDER_EDGE_COST * 2;
-                    else {
-                        layerCost += TRANSPONDER_EDGE_COST * 2 * bwWithGB / NetworkState.getTxCapacityOfTransponders();
-                    }
-                } else {
-                    layerCost = Double.MAX_VALUE;
-                    break;
                 }
-            } else {
-                layerCost = Double.MAX_VALUE;
-                break;
-            }
+
+        for (int i = 0; i < listOfSpectrumEdges.size(); i++) {
+            if (i == listOfSpectrumEdges.size() - 1) layerCost += addTransponderCost();
+            else if (i == 0) continue;
+            else if (!listOfSpectrumEdges.get(i).getEdgeElement().getSourceVertex().equals(listOfSpectrumEdges.get(i - 1).getEdgeElement().getDestinationVertex()))
+                continue;
+            else layerCost += addTransponderCost();
         }
+
+
+        /**Check if there is continuous path*/
+        int counterPath = 0;
+        for (EdgeElement e : p.getPathElement().getTraversedEdges()) {
+            outerLoop:
+            for (LightPathEdge lpe : listLightPathEdges)
+                for (EdgeElement ee : lpe.getLightPath().getPathElement().getTraversedEdges())
+                    if (ee.equals(e)) {
+                        counterPath++;
+                        break outerLoop;
+                    }
+            outerLoop:
+            for (SpectrumEdge see : listOfSpectrumEdges)
+                if (see.getEdgeElement().equals(e)) {
+                    counterPath++;
+                    break outerLoop;
+                }
+        }
+
+        if (counterPath != p.getPathElement().getTraversedEdges().size())
+            layerCost = Double.MAX_VALUE;
 
         return layerCost;
     }
@@ -124,61 +154,46 @@ public class AuxiliaryGraph {
     public void setConnection(Path path, int miniGrid) {
 
         Set<LightPath> newLightPaths = new HashSet<>();
-        List<LightPathEdge> selectedLightPathEdges = new ArrayList<>();
         List<SpectrumEdge> selectedSpectrumEdges = new ArrayList<>();
 
         newConnection = new Connection(currentTime, ht, bw, feature);
 
-        LightPathEdge lpe;
+        List<LightPathEdge> selectedLightPathEdges = getLightPathEdges(miniGrid);
+
         SpectrumEdge se;
-        for (EdgeElement e : path.getPathElement().getTraversedEdges()) {
-            if ((lpe = getLightPathEdge(e, miniGrid)) != null)
-                selectedLightPathEdges.add(lpe);
+        for (EdgeElement e : path.getPathElement().getTraversedEdges())
             if ((se = getSpectrumEdge(e, miniGrid)) != null)
                 selectedSpectrumEdges.add(se);
-        }
+
 
         /** If the path contains spectrum edges then establish new lightpath **/
-        if (selectedSpectrumEdges.size() > 1) {
+        if (!selectedSpectrumEdges.isEmpty()) {
             int srcIndex = 0;
-            for (int i = 1; i < selectedSpectrumEdges.size(); i++) {
+            for (int i = 0; i < selectedSpectrumEdges.size(); i++) {
                 if (i == selectedSpectrumEdges.size() - 1) {
                     newLightPaths.add(new LightPath(
                             NetworkState.getPathElement(selectedSpectrumEdges.get(srcIndex).getEdgeElement().getSourceVertex().getVertexID(),
                                     selectedSpectrumEdges.get(i).getEdgeElement().getDestinationVertex().getVertexID()),
-                            miniGrid, bwWithGB, newConnection));
-                } else if (selectedSpectrumEdges.get(i).getEdgeElement().getSourceVertex().equals(selectedSpectrumEdges.get(i - 1).getEdgeElement().getDestinationVertex()))
+                            miniGrid, bwWithGB, bw,newConnection));
+                } else if (i == 0) continue;
+                else if (selectedSpectrumEdges.get(i).getEdgeElement().getSourceVertex().equals(selectedSpectrumEdges.get(i - 1).getEdgeElement().getDestinationVertex()))
                     continue;
                 else {
                     newLightPaths.add(new LightPath(
                             NetworkState.getPathElement(selectedSpectrumEdges.get(srcIndex).getEdgeElement().getSourceVertex().getVertexID(),
                                     selectedSpectrumEdges.get(i).getEdgeElement().getDestinationVertex().getVertexID()),
-                            miniGrid, bwWithGB, newConnection));
+                            miniGrid, bwWithGB, bw , newConnection));
                     srcIndex = i;
                 }
             }
-        } else if (selectedSpectrumEdges.size() == 1) {
-            newLightPaths.add(new LightPath(
-                    NetworkState.getPathElement(selectedSpectrumEdges.get(0).getEdgeElement().getSourceVertex().getVertexID(),
-                            selectedSpectrumEdges.get(0).getEdgeElement().getDestinationVertex().getVertexID()),
-                    miniGrid, bwWithGB, newConnection));
         }
 
-        /** If the path contains lightpath edges, then route the request by allocating more subcarriers*/
+
+        /** Expand existing lightpaths*/
         if (!selectedLightPathEdges.isEmpty())
-            for (LightPathEdge lightPathEdge : selectedLightPathEdges) {
-                lightPathEdge.getLightPath().expandLightPath(bw);
-                lightPathEdge.getLightPath().addNewConnection(newConnection);
-            }
+            for (LightPathEdge lightPathEdge : selectedLightPathEdges)
+                lightPathEdge.getLightPath().expandLightPath(bw, newConnection);
 
-        /** Update network state*/
-        /** for each new light path, extend allocating more sub-carriers*/
-        for (LightPath lp : newLightPaths) {
-            for (EdgeElement e : lp.getPathElement().getTraversedEdges()) {
-                FiberLink fl = NetworkState.getFiberLinksMap().get(e.getEdgeID());
-                fl.setUsedMiniGrid(lp.getMiniGridIds());
-            }
-        }
         NetworkState.getListOfLightPaths().addAll(newLightPaths);
     }
 
@@ -197,17 +212,15 @@ public class AuxiliaryGraph {
         return null;
     }
 
-    public LightPathEdge getLightPathEdge(EdgeElement e, int miniGridIndex) {
+    public List<LightPathEdge> getLightPathEdges(int miniGridIndex) {
 
-        for (LightPathEdge lpe : listOfLPE) {
-            for (EdgeElement edge : lpe.getLightPath().getPathElement().getTraversedEdges()) {
-                if (!edge.equals(e)) continue;
-                if (lpe.getLightPath().containsMiniGrid(miniGridIndex))
-                    return lpe;
-            }
-        }
+        List<LightPathEdge> lightPathEdges = new ArrayList<>();
 
-        return null;
+        for (LightPathEdge lpe : listOfLPE)
+            if (lpe.getLightPath().containsMiniGrid(miniGridIndex))
+                lightPathEdges.add(lpe);
+
+        return lightPathEdges;
     }
 
     public Connection getNewConnection() {
