@@ -7,6 +7,8 @@ import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.path.PathElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -21,6 +23,8 @@ public class NetworkState {
     private static List<Path> listOfPaths;
     private static int txCapacityOfTransponders;
     private static int numOfMiniGridsPerGB;
+
+    private static final Logger log = LoggerFactory.getLogger(NetworkState.class);
 
     public NetworkState(Gcontroller graph, int granularity, int spectrumWidth, int txCapacityOfTransponders, int numOfMiniGridsPerGB, Set<PathElement> setOfPathElements) {
 
@@ -47,6 +51,7 @@ public class NetworkState {
                 for (int j = i + 1; j < vertexElements.size(); j++)
                     listOfLightPaths.addAll(getListOfLightPaths(vertexElements.get(i), vertexElements.get(j)));
         }
+
         return listOfLightPaths;
     }
 
@@ -55,19 +60,19 @@ public class NetworkState {
 
         for (LightPath lp : listOfLightPaths)
             if (lp.getPathElement().getSource().equals(src) && lp.getPathElement().getDestination().equals(dst))
-                lightPaths.add(lp);
+                if (!listOfLightPaths.contains(lp))
+                    lightPaths.add(lp);
 
         return lightPaths;
     }
 
-    public static PathElement getPathElement(String src, String dst) {
+    public static PathElement getPathElement(List<VertexElement> vertexes) {
 
         for (Path path : listOfPaths)
-            if (path.getPathElement().getSourceID().equals(src) && path.getPathElement().getDestinationID().equals(dst))
+            if (path.getPathElement().getTraversedVertices().equals(vertexes))
                 return path.getPathElement();
 
         return null;
-
     }
 
     public static FiberLink getFiberLink(String edgeID) {

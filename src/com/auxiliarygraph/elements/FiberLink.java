@@ -1,6 +1,8 @@
 package com.auxiliarygraph.elements;
 
 import com.graph.elements.edge.EdgeElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +24,8 @@ public class FiberLink {
     private Map<Integer, Integer> miniGrids;
     private EdgeElement edgeElement;
     private int totalNumberOfMiniGrids;
+
+    private static final Logger log = LoggerFactory.getLogger(FiberLink.class);
 
     public FiberLink(int granularity, int spectrumWidth, EdgeElement edgeElement) {
         this.edgeElement = edgeElement;
@@ -60,15 +64,34 @@ public class FiberLink {
         return freeMiniGrids;
     }
 
-    public boolean areMiniGridsAvailable(int startingPoint, int n) {
+    public boolean areNextMiniGridsAvailable(int startingPoint, int additionalMiniGrids) {
+
         boolean isAvailable = true;
-        for (int i = startingPoint + 1; i < startingPoint + 1 + n; i++) {
+        for (int i = startingPoint; i < startingPoint + additionalMiniGrids; i++) {
             if (!miniGrids.containsKey(i)) {
                 isAvailable = false;
                 break;
             }
-            if (miniGrids.get(i) == 1)
+            if (miniGrids.get(i) == 1) {
                 isAvailable = false;
+                break;
+            }
+        }
+        return isAvailable;
+    }
+
+    public boolean arePreviousMiniGridsAvailable(int startingPoint, int additionalMiniGrids) {
+
+        boolean isAvailable = true;
+        for (int i = startingPoint; i > startingPoint - additionalMiniGrids; i--) {
+            if (!miniGrids.containsKey(i)) {
+                isAvailable = false;
+                break;
+            }
+            if (miniGrids.get(i) == 1) {
+                isAvailable = false;
+                break;
+            }
         }
         return isAvailable;
     }
@@ -96,14 +119,24 @@ public class FiberLink {
     }
 
     public void setFreeMiniGrid(int id) {
+        if (miniGrids.get(id) == 0)
+            log.error("BUG: setting free an already free Mini-Grid");
         miniGrids.replace(id, miniGrids.get(id), 0);
     }
 
     public void setUsedMiniGrid(int id) {
+        if (miniGrids.get(id) != 0)
+            log.error("BUG: setting as used an already used Mini-Grid");
         miniGrids.replace(id, miniGrids.get(id), 1);
     }
 
+    public int getMiniGrid(int index) {
+        return miniGrids.get(index);
+    }
+
     public void setGuardBandMiniGrid(int id) {
+        if (miniGrids.get(id) != 0)
+            log.error("BUG: setting as guard band an already used Mini-Grid");
         miniGrids.replace(id, miniGrids.get(id), 2);
     }
 

@@ -12,8 +12,8 @@ public class LightPathEdge {
 
     public LightPathEdge(LightPath lightPath) {
         this.lightPath = lightPath;
-        COST = 1 + (lightPath.getPathElement().getTraversedVertices().size() - 2) * 10e-7;
-//        COST = lightPath.getPathElement().getTraversedVertices().size();
+        COST = 1 + lightPath.getPathElement().getTraversedEdges().size() * 10e-7;
+//        COST = lightPath.getPathElement().getTraversedEdges().size();
     }
 
     public LightPath getLightPath() {

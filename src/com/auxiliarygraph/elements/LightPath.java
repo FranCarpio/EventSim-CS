@@ -3,6 +3,8 @@ package com.auxiliarygraph.elements;
 import com.auxiliarygraph.NetworkState;
 import com.graph.elements.edge.EdgeElement;
 import com.graph.path.PathElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +19,7 @@ public class LightPath {
     private PathElement pathElement;
     private List<Integer> miniGridIds;
     private Map<Double, Connection> connectionMap;
+    private static final Logger log = LoggerFactory.getLogger(LightPath.class);
 
     public LightPath(PathElement pathElement, int initialMiniGrid, int bwWithGB, int bw, Connection connection) {
         this.pathElement = pathElement;
@@ -29,8 +32,12 @@ public class LightPath {
         connectionMap.put(connection.getStartingTime(), connection);
 
         for (EdgeElement e : pathElement.getTraversedEdges()) {
-            for (int i = 0; i < bw; i++)
+            for (int i = 0; i < bw; i++) {
+                if (NetworkState.getFiberLinksMap().get(e.getEdgeID()).getMiniGrid(miniGridIds.get(i)) == 1)
+                    log.error("BUG");
+
                 NetworkState.getFiberLinksMap().get(e.getEdgeID()).setUsedMiniGrid(miniGridIds.get(i));
+            }
             for (int i = bw; i < bwWithGB; i++)
                 NetworkState.getFiberLinksMap().get(e.getEdgeID()).setGuardBandMiniGrid(miniGridIds.get(i));
         }
@@ -41,7 +48,7 @@ public class LightPath {
     }
 
     public void expandLightPath(int bw, Connection connection) {
-        int firstFreeMiniGrid = miniGridIds.size() + 1;
+        int firstFreeMiniGrid = miniGridIds.get(miniGridIds.size()-1) + 1;
         for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw; i++) {
             miniGridIds.add(i);
             for (EdgeElement e : pathElement.getTraversedEdges())
@@ -50,11 +57,11 @@ public class LightPath {
         connectionMap.put(connection.getStartingTime(), connection);
     }
 
-    public boolean canBeExpanded(int n) {
+    public boolean canBeExpanded(int bw) {
         boolean canBeExpanded = true;
 
         for (EdgeElement e : pathElement.getTraversedEdges())
-            if (!NetworkState.getFiberLink(e.getEdgeID()).areMiniGridsAvailable(miniGridIds.get(miniGridIds.size() - 1), n))
+            if (!NetworkState.getFiberLink(e.getEdgeID()).areNextMiniGridsAvailable(miniGridIds.get(miniGridIds.size() - 1) + 1, bw))
                 canBeExpanded = false;
 
         return canBeExpanded;
