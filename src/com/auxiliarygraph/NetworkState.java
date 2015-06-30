@@ -17,7 +17,6 @@ import java.util.*;
  */
 public class NetworkState {
 
-    private Gcontroller graph;
     private static Map<String, FiberLink> fiberLinksMap;
     private static List<LightPath> listOfLightPaths;
     private static List<Path> listOfPaths;
@@ -28,7 +27,6 @@ public class NetworkState {
 
     public NetworkState(Gcontroller graph, int granularity, int spectrumWidth, int txCapacityOfTransponders, int numOfMiniGridsPerGB, Set<PathElement> setOfPathElements) {
 
-        this.graph = graph;
         this.fiberLinksMap = new HashMap<>();
         this.listOfLightPaths = new ArrayList<>();
         this.listOfPaths = new ArrayList<>();
@@ -48,8 +46,12 @@ public class NetworkState {
         for (Path p : listOfCandidatePaths) {
             List<VertexElement> vertexElements = p.getPathElement().getTraversedVertices();
             for (int i = 0; i < vertexElements.size() - 1; i++)
-                for (int j = i + 1; j < vertexElements.size(); j++)
-                    listOfLightPaths.addAll(getListOfLightPaths(vertexElements.get(i), vertexElements.get(j)));
+                for (int j = i + 1; j < vertexElements.size(); j++) {
+                    List<LightPath> tmpListOfLP = getListOfLightPaths(vertexElements.get(i), vertexElements.get(j));
+                    for(LightPath lp:tmpListOfLP)
+                        if(!listOfLightPaths.contains(lp))
+                             listOfLightPaths.add(lp);
+                }
         }
 
         return listOfLightPaths;
@@ -60,7 +62,6 @@ public class NetworkState {
 
         for (LightPath lp : listOfLightPaths)
             if (lp.getPathElement().getSource().equals(src) && lp.getPathElement().getDestination().equals(dst))
-                if (!listOfLightPaths.contains(lp))
                     lightPaths.add(lp);
 
         return lightPaths;

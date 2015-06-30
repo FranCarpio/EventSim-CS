@@ -7,6 +7,7 @@ import com.auxiliarygraph.elements.LightPath;
 import com.auxiliarygraph.elements.Path;
 import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.vertex.VertexElement;
+import com.graph.path.PathElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class AuxiliaryGraph {
     public AuxiliaryGraph(String src, String dst, int b, double currentTime, double ht, boolean feature) {
         listOfLPE = new ArrayList<>();
         listOfSE = new ArrayList<>();
-        this.bw = 1;
+        this.bw = b;
         this.bwWithGB = bw + 2 * GUARD_BAND;
         this.currentTime = currentTime;
         this.ht = ht;
@@ -62,7 +63,7 @@ public class AuxiliaryGraph {
         /** For each pre-existing lightpath ...*/
         for (LightPath lp : NetworkState.getListOfLightPaths(listOfCandidatePaths))
         /** If the lightpath can carry more traffic allocating more mini grids...*/
-            if (lp.canBeExpanded(bw))
+            if (lp.canBeExpandedLeft(bw) || lp.canBeExpandedRight(bw))
                 listOfLPE.add(new LightPathEdge(lp));
     }
 
@@ -225,10 +226,21 @@ public class AuxiliaryGraph {
         List<LightPathEdge> lightPathEdges = new ArrayList<>();
 
         for (LightPathEdge lpe : listOfLPE)
-            if (lpe.getLightPath().containsMiniGrid(miniGridIndex) && lpe.getLightPath().getPathElement().equals(p.getPathElement()))
-                lightPathEdges.add(lpe);
+            if (lpe.getLightPath().containsMiniGrid(miniGridIndex)) {
+                if(comparePaths(p.getPathElement(),lpe.getLightPath().getPathElement()))
+                    lightPathEdges.add(lpe);
+            }
 
         return lightPathEdges;
+    }
+
+    public boolean comparePaths(PathElement mainPath, PathElement pathToCompare) {
+
+        for (EdgeElement e : pathToCompare.getTraversedEdges()) {
+            if (!mainPath.containsEdge(e))
+                return false;
+        }
+        return true;
     }
 
     public Connection getNewConnection() {

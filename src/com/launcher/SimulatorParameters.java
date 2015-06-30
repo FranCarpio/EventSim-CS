@@ -46,7 +46,6 @@ public class SimulatorParameters {
 
         /** Input network from a SNDLib file */
         new InputParameters(networkFile);
-//        setGenerators();
         new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
         runSimulation();
     }

@@ -66,34 +66,24 @@ public class FiberLink {
 
     public boolean areNextMiniGridsAvailable(int startingPoint, int additionalMiniGrids) {
 
-        boolean isAvailable = true;
         for (int i = startingPoint; i < startingPoint + additionalMiniGrids; i++) {
-            if (!miniGrids.containsKey(i)) {
-                isAvailable = false;
-                break;
-            }
-            if (miniGrids.get(i) == 1) {
-                isAvailable = false;
-                break;
-            }
+            if (!miniGrids.containsKey(i))
+                return false;
+            if (miniGrids.get(i) != 0)
+                return false;
         }
-        return isAvailable;
+        return true;
     }
 
     public boolean arePreviousMiniGridsAvailable(int startingPoint, int additionalMiniGrids) {
 
-        boolean isAvailable = true;
         for (int i = startingPoint; i > startingPoint - additionalMiniGrids; i--) {
-            if (!miniGrids.containsKey(i)) {
-                isAvailable = false;
-                break;
-            }
-            if (miniGrids.get(i) == 1) {
-                isAvailable = false;
-                break;
-            }
+            if (!miniGrids.containsKey(i))
+                return false;
+            if (miniGrids.get(i) != 0)
+                return false;
         }
-        return isAvailable;
+        return true;
     }
 
     public double getUtilization() {

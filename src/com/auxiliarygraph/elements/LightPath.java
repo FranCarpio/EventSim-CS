@@ -6,10 +6,7 @@ import com.graph.path.PathElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Fran on 6/11/2015.
@@ -32,12 +29,9 @@ public class LightPath {
         connectionMap.put(connection.getStartingTime(), connection);
 
         for (EdgeElement e : pathElement.getTraversedEdges()) {
-            for (int i = 0; i < bw; i++) {
-                if (NetworkState.getFiberLinksMap().get(e.getEdgeID()).getMiniGrid(miniGridIds.get(i)) == 1)
-                    log.error("BUG");
-
+            for (int i = 0; i < bw; i++)
                 NetworkState.getFiberLinksMap().get(e.getEdgeID()).setUsedMiniGrid(miniGridIds.get(i));
-            }
+
             for (int i = bw; i < bwWithGB; i++)
                 NetworkState.getFiberLinksMap().get(e.getEdgeID()).setGuardBandMiniGrid(miniGridIds.get(i));
         }
@@ -48,23 +42,40 @@ public class LightPath {
     }
 
     public void expandLightPath(int bw, Connection connection) {
-        int firstFreeMiniGrid = miniGridIds.get(miniGridIds.size()-1) + 1;
-        for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw; i++) {
-            miniGridIds.add(i);
-            for (EdgeElement e : pathElement.getTraversedEdges())
-                NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
+
+        if (canBeExpandedLeft(bw)) {
+            int firstFreeMiniGrid = miniGridIds.get(0) - 1;
+            for (int i = firstFreeMiniGrid; i > firstFreeMiniGrid - bw; i--) {
+                miniGridIds.add(i);
+                for (EdgeElement e : pathElement.getTraversedEdges())
+                    NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
+            }
+            Collections.sort(miniGridIds);
+        } else {
+            int firstFreeMiniGrid = miniGridIds.get(miniGridIds.size() - 1) + 1;
+            for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw; i++) {
+                miniGridIds.add(i);
+                for (EdgeElement e : pathElement.getTraversedEdges())
+                    NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
+            }
         }
         connectionMap.put(connection.getStartingTime(), connection);
     }
 
-    public boolean canBeExpanded(int bw) {
-        boolean canBeExpanded = true;
+    public boolean canBeExpandedRight(int bw) {
 
         for (EdgeElement e : pathElement.getTraversedEdges())
             if (!NetworkState.getFiberLink(e.getEdgeID()).areNextMiniGridsAvailable(miniGridIds.get(miniGridIds.size() - 1) + 1, bw))
-                canBeExpanded = false;
+                return false;
+        return true;
+    }
 
-        return canBeExpanded;
+    public boolean canBeExpandedLeft(int bw) {
+
+        for (EdgeElement e : pathElement.getTraversedEdges())
+            if (!NetworkState.getFiberLink(e.getEdgeID()).arePreviousMiniGridsAvailable(miniGridIds.get(0) - 1, bw))
+                return false;
+        return true;
     }
 
     public boolean containsMiniGrid(int miniGrid) {
@@ -75,11 +86,21 @@ public class LightPath {
     }
 
     public void removeConnection(Connection connection) {
+
         connectionMap.remove(connection.getStartingTime());
-        for (int i = 0; i < connection.getBw(); i++) {
+        List<Integer> miniGridsToRemove = new ArrayList<>();
+
+        for (int i = 0; i < miniGridIds.size(); i++)
+            if(NetworkState.getFiberLink(pathElement.getTraversedEdges().get(0).getEdgeID()).getMiniGrid(miniGridIds.get(i)) == 1) {
+                miniGridsToRemove.add(miniGridIds.get(i));
+                if(miniGridsToRemove.size()==connection.getBw())
+                    break;
+            }
+        
+        for (int i = 0; i < miniGridsToRemove.size(); i++) {
             for (EdgeElement e : pathElement.getTraversedEdges())
-                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(miniGridIds.size() - 1));
-            miniGridIds.remove(miniGridIds.size() - 1);
+                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridsToRemove.get(i));
+            miniGridIds.remove(miniGridsToRemove.get(i));
         }
     }
 
