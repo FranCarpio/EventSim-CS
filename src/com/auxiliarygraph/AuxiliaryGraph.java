@@ -27,8 +27,8 @@ public class AuxiliaryGraph {
     private final int GUARD_BAND = NetworkState.getNumOfMiniGridsPerGB();
     private int bwWithGB;
     private int bw;
-    private final double TRANSPONDER_EDGE_COST = 1e3;
-    //        private final double TRANSPONDER_EDGE_COST = 0;
+    //    private final double TRANSPONDER_EDGE_COST = 1e3;
+    private final double TRANSPONDER_EDGE_COST = 0;
     private Connection newConnection;
     private double currentTime;
     private double ht;
@@ -43,7 +43,7 @@ public class AuxiliaryGraph {
         listOfLPE = new ArrayList<>();
         listOfSE = new ArrayList<>();
         this.bw = b;
-        this.bwWithGB = bw + 2 * GUARD_BAND;
+        this.bwWithGB = bw + /**2 ***/GUARD_BAND;
         this.currentTime = currentTime;
         this.ht = ht;
         this.feature = feature;
@@ -57,7 +57,7 @@ public class AuxiliaryGraph {
                 List<Integer> freeMiniGrids = NetworkState.getFiberLink(e.getEdgeID()).getFreeMiniGrids(bwWithGB);
                 if (freeMiniGrids.size() >= bwWithGB)
                     for (Integer i : freeMiniGrids)
-                        listOfSE.add(new SpectrumEdge(e, i));
+                        listOfSE.add(new SpectrumEdge(e, i, bw));
             }
 
         /** For each pre-existing lightpath ...*/
@@ -227,7 +227,7 @@ public class AuxiliaryGraph {
 
         for (LightPathEdge lpe : listOfLPE)
             if (lpe.getLightPath().containsMiniGrid(miniGridIndex)) {
-                if(comparePaths(p.getPathElement(),lpe.getLightPath().getPathElement()))
+                if (comparePaths(p.getPathElement(), lpe.getLightPath().getPathElement()))
                     lightPathEdges.add(lpe);
             }
 

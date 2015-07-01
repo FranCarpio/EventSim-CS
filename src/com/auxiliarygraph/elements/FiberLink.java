@@ -130,6 +130,16 @@ public class FiberLink {
         miniGrids.replace(id, miniGrids.get(id), 2);
     }
 
+    public int getNumberOfMiniGridsUsed() {
+        int usedMiniGrids = 0;
+
+        for (Map.Entry<Integer, Integer> entry : miniGrids.entrySet())
+            if (entry.getValue() == 1 || entry.getValue() == 2)
+                usedMiniGrids++;
+
+        return usedMiniGrids;
+    }
+
     public void setReservedMiniGrid(int id) {
         miniGrids.replace(id, miniGrids.get(id), 3);
     }

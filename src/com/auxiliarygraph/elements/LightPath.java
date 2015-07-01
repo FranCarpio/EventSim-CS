@@ -91,12 +91,12 @@ public class LightPath {
         List<Integer> miniGridsToRemove = new ArrayList<>();
 
         for (int i = 0; i < miniGridIds.size(); i++)
-            if(NetworkState.getFiberLink(pathElement.getTraversedEdges().get(0).getEdgeID()).getMiniGrid(miniGridIds.get(i)) == 1) {
+            if (NetworkState.getFiberLink(pathElement.getTraversedEdges().get(0).getEdgeID()).getMiniGrid(miniGridIds.get(i)) == 1) {
                 miniGridsToRemove.add(miniGridIds.get(i));
-                if(miniGridsToRemove.size()==connection.getBw())
+                if (miniGridsToRemove.size() == connection.getBw())
                     break;
             }
-        
+
         for (int i = 0; i < miniGridsToRemove.size(); i++) {
             for (EdgeElement e : pathElement.getTraversedEdges())
                 NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridsToRemove.get(i));
@@ -112,5 +112,17 @@ public class LightPath {
         for (EdgeElement e : pathElement.getTraversedEdges())
             for (Integer i : miniGridIds)
                 NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(i);
+    }
+
+    public int getNumberOfMiniGridsUsedAlongLP() {
+        int usedMiniGrids = 0;
+
+        for (EdgeElement e : pathElement.getTraversedEdges()) {
+            FiberLink fl = NetworkState.getFiberLink(e.getEdgeID());
+            usedMiniGrids += fl.getNumberOfMiniGridsUsed();
+        }
+
+        return usedMiniGrids;
+
     }
 }
