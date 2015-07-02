@@ -28,7 +28,7 @@ public class SimulatorParameters {
     private static double simulationTime;
     private static int numberOfTotalRequests;
     private static int numberOfRuns;
-    private static int _runNumber = -1;
+    private static int _runNumber = 0;
     private static List<byte[]> listOfSeeds;
     private static int seedCounter;
     private static int spectrumWidth;

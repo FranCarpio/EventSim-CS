@@ -27,8 +27,8 @@ public class AuxiliaryGraph {
     private final int GUARD_BAND = NetworkState.getNumOfMiniGridsPerGB();
     private int bwWithGB;
     private int bw;
-    //    private final double TRANSPONDER_EDGE_COST = 1e3;
-    private final double TRANSPONDER_EDGE_COST = 0;
+    private final double TRANSPONDER_EDGE_COST = 1e3;
+//    private final double TRANSPONDER_EDGE_COST = 0;
     private Connection newConnection;
     private double currentTime;
     private double ht;
@@ -201,7 +201,10 @@ public class AuxiliaryGraph {
         /** Expand existing lightpaths*/
         if (!selectedLightPathEdges.isEmpty())
             for (LightPathEdge lightPathEdge : selectedLightPathEdges)
-                lightPathEdge.getLightPath().expandLightPath(bw, newConnection);
+                if (lightPathEdge.getLightPath().canBeExpandedLeft(bw))
+                    lightPathEdge.getLightPath().expandLightPathOnLeftSide(bw, newConnection);
+                else
+                    lightPathEdge.getLightPath().expandLightPathOnRightSide(bw, newConnection);
 
         NetworkState.getListOfLightPaths().addAll(newLightPaths);
     }

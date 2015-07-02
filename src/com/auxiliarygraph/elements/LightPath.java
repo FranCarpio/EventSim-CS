@@ -17,11 +17,13 @@ public class LightPath {
     private List<Integer> miniGridIds;
     private Map<Double, Connection> connectionMap;
     private static final Logger log = LoggerFactory.getLogger(LightPath.class);
+    private final int GUARD_BANDS;
 
     public LightPath(PathElement pathElement, int initialMiniGrid, int bwWithGB, int bw, Connection connection) {
         this.pathElement = pathElement;
         this.miniGridIds = new ArrayList<>();
         this.connectionMap = new HashMap<>();
+        this.GUARD_BANDS = bwWithGB - bw;
 
         for (int i = initialMiniGrid; i < initialMiniGrid + bwWithGB; i++)
             miniGridIds.add(i);
@@ -41,25 +43,41 @@ public class LightPath {
         return pathElement;
     }
 
-    public void expandLightPath(int bw, Connection connection) {
+    public void expandLightPathOnLeftSide(int bw, Connection connection) {
 
-        if (canBeExpandedLeft(bw)) {
-            int firstFreeMiniGrid = miniGridIds.get(0) - 1;
-            for (int i = firstFreeMiniGrid; i > firstFreeMiniGrid - bw; i--) {
-                miniGridIds.add(i);
-                for (EdgeElement e : pathElement.getTraversedEdges())
-                    NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
-            }
-            Collections.sort(miniGridIds);
-        } else {
-            int firstFreeMiniGrid = miniGridIds.get(miniGridIds.size() - 1) + 1;
-            for (int i = firstFreeMiniGrid; i < firstFreeMiniGrid + bw; i++) {
-                miniGridIds.add(i);
-                for (EdgeElement e : pathElement.getTraversedEdges())
-                    NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
-            }
+        int firstFreeMiniGrid = miniGridIds.get(0) - 1;
+        for (int i = firstFreeMiniGrid; i > firstFreeMiniGrid - bw; i--) {
+            miniGridIds.add(i);
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
         }
+        Collections.sort(miniGridIds);
+
         connectionMap.put(connection.getStartingTime(), connection);
+    }
+
+    public void expandLightPathOnRightSide(int bw, Connection connection) {
+
+        /** Expand the fiber links */
+        int miniGrid = miniGridIds.get(miniGridIds.size() - 1 - GUARD_BANDS) + 1;
+
+        for (int i = miniGrid; i < miniGrid + bw; i++)
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setUsedMiniGrid(i);
+
+        /** Move Guard Bands*/
+        for (int i = miniGrid + bw; i < miniGrid + bw + GUARD_BANDS; i++)
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setGuardBandMiniGrid(i);
+
+        /** Assign Mini-Grids to the LightPath*/
+        miniGrid = miniGridIds.get(miniGridIds.size() - 1) + 1;
+        for (int i = miniGrid; i < connection.getBw() + miniGrid; i++)
+            miniGridIds.add(i);
+
+        /** Add the connection*/
+        connectionMap.put(connection.getStartingTime(), connection);
+
     }
 
     public boolean canBeExpandedRight(int bw) {
@@ -88,20 +106,14 @@ public class LightPath {
     public void removeConnection(Connection connection) {
 
         connectionMap.remove(connection.getStartingTime());
-        List<Integer> miniGridsToRemove = new ArrayList<>();
 
-        for (int i = 0; i < miniGridIds.size(); i++)
-            if (NetworkState.getFiberLink(pathElement.getTraversedEdges().get(0).getEdgeID()).getMiniGrid(miniGridIds.get(i)) == 1) {
-                miniGridsToRemove.add(miniGridIds.get(i));
-                if (miniGridsToRemove.size() == connection.getBw())
-                    break;
-            }
-
-        for (int i = 0; i < miniGridsToRemove.size(); i++) {
+        for (int i = 0; i < connection.getBw(); i++)
             for (EdgeElement e : pathElement.getTraversedEdges())
-                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridsToRemove.get(i));
-            miniGridIds.remove(miniGridsToRemove.get(i));
-        }
+                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
+
+        for (int i = 0; i < connection.getBw(); i++)
+            miniGridIds.remove(0);
+
     }
 
     public Map<Double, Connection> getConnectionMap() {
