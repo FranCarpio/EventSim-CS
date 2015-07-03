@@ -103,16 +103,15 @@ public class LightPath {
         return false;
     }
 
-    public void removeConnection(Connection connection) {
+    public int getNumberOfMiniGridsUsedAlongLP() {
+        int usedMiniGrids = 0;
 
-        connectionMap.remove(connection.getStartingTime());
+        for (EdgeElement e : pathElement.getTraversedEdges()) {
+            FiberLink fl = NetworkState.getFiberLink(e.getEdgeID());
+            usedMiniGrids += fl.getNumberOfMiniGridsUsed();
+        }
 
-        for (int i = 0; i < connection.getBw(); i++)
-            for (EdgeElement e : pathElement.getTraversedEdges())
-                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
-
-        for (int i = 0; i < connection.getBw(); i++)
-            miniGridIds.remove(0);
+        return usedMiniGrids;
 
     }
 
@@ -126,15 +125,37 @@ public class LightPath {
                 NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(i);
     }
 
-    public int getNumberOfMiniGridsUsedAlongLP() {
-        int usedMiniGrids = 0;
+    public void removeConnectionOnLeftSide(Connection connection) {
 
-        for (EdgeElement e : pathElement.getTraversedEdges()) {
-            FiberLink fl = NetworkState.getFiberLink(e.getEdgeID());
-            usedMiniGrids += fl.getNumberOfMiniGridsUsed();
-        }
+        connectionMap.remove(connection.getStartingTime());
 
-        return usedMiniGrids;
+        for (int i = 0; i < connection.getBw(); i++)
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
+
+        for (int i = 0; i < connection.getBw(); i++)
+            miniGridIds.remove(0);
 
     }
+
+    public void removeConnectionOnRightSide(Connection connection) {
+
+        connectionMap.remove(connection.getStartingTime());
+
+        int lastMiniGrid = miniGridIds.size()-1;
+        for (int i = lastMiniGrid; i > lastMiniGrid - connection.getBw(); i--)
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
+
+        lastMiniGrid = miniGridIds.size() - 1 - (int) connection.getBw();
+        for (int i = lastMiniGrid; i > lastMiniGrid - GUARD_BANDS; i--)
+            for (EdgeElement e : pathElement.getTraversedEdges())
+                NetworkState.getFiberLink(e.getEdgeID()).setGuardBandMiniGrid(miniGridIds.get(i));
+
+        for (int i = 0; i < connection.getBw(); i++)
+            miniGridIds.remove(miniGridIds.size() - 1);
+
+    }
+
+
 }

@@ -27,13 +27,10 @@ public class AuxiliaryGraph {
     private final int GUARD_BAND = NetworkState.getNumOfMiniGridsPerGB();
     private int bwWithGB;
     private int bw;
-    private final double TRANSPONDER_EDGE_COST = 1e3;
-//    private final double TRANSPONDER_EDGE_COST = 0;
     private Connection newConnection;
     private double currentTime;
     private double ht;
     private boolean feature;
-
     private static final Logger log = LoggerFactory.getLogger(AuxiliaryGraph.class);
 
     /**
@@ -47,6 +44,7 @@ public class AuxiliaryGraph {
         this.currentTime = currentTime;
         this.ht = ht;
         this.feature = feature;
+
 
         /** Search for candidate paths between S and D*/
         List<Path> listOfCandidatePaths = NetworkState.getListOfPaths(src, dst);
@@ -71,9 +69,9 @@ public class AuxiliaryGraph {
         double transponderCost = 0;
 
         if (bwWithGB / NetworkState.getTxCapacityOfTransponders() == 0)
-            transponderCost += TRANSPONDER_EDGE_COST * 2;
+            transponderCost += Weights.getTransponderEdgeCost() * 2;
         else {
-            transponderCost += TRANSPONDER_EDGE_COST * 2 * bwWithGB / NetworkState.getTxCapacityOfTransponders();
+            transponderCost += Weights.getTransponderEdgeCost() * 2 * bwWithGB / NetworkState.getTxCapacityOfTransponders();
         }
 
         return transponderCost;

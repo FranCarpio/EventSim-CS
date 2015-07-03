@@ -1,5 +1,6 @@
 package com.auxiliarygraph.edges;
 
+import com.auxiliarygraph.Weights;
 import com.auxiliarygraph.elements.LightPath;
 
 /**
@@ -7,15 +8,12 @@ import com.auxiliarygraph.elements.LightPath;
  */
 public class LightPathEdge {
 
-    private final double COST;
+    private double cost;
     private LightPath lightPath;
 
     public LightPathEdge(LightPath lightPath) {
         this.lightPath = lightPath;
-        COST = 1 + lightPath.getPathElement().getTraversedEdges().size() * 10e-7;
-//        COST = lightPath.getPathElement().getTraversedEdges().size();
-//        COST = lightPath.getNumberOfMiniGridsUsedAlongLP();
-
+        cost = Weights.getLightPathEdgeCost(lightPath);
     }
 
     public LightPath getLightPath() {
@@ -23,7 +21,7 @@ public class LightPathEdge {
     }
 
     public double getCost() {
-        return COST;
+        return cost;
     }
 
 }
