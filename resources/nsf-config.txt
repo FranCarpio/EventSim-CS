@@ -5,7 +5,7 @@ nsf-network.txt
 # Max number of total request events before to stop the simulation
 1000000
 # Number of simulations
-2
+1
 # Spectrum width (Ghz)
 1000
 # g: grid granularity (Ghz)

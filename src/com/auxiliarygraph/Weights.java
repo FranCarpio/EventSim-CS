@@ -7,11 +7,12 @@ import com.auxiliarygraph.elements.LightPath;
  */
 public class Weights {
 
+    private static final int POLICY = 4;
     private static double transponderEdgeCost;
 
-    public Weights(int policy) {
+    public Weights() {
 
-        switch (policy) {
+        switch (POLICY) {
             /** MinLP */
             case 1:
                 transponderEdgeCost = 1e3;
@@ -32,9 +33,12 @@ public class Weights {
     }
 
     public static double getSpectrumEdgeCost(String edgeID, int spectrumLayerIndex, int bw) {
-        return 1e-5 * spectrumLayerIndex;
+        /** MinLP */ /** MinHops */
+//        return 1e-5 * spectrumLayerIndex;
+        /** MinTHP*/
 //        return  1 + 1e-5 * spectrumLayerIndex;
-//        return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * spectrumLayerIndex;
+        /** LB*/
+        return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * spectrumLayerIndex;
 
 //        if (bw == 4 && spectrumLayerIndex >= 128)
 //            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
@@ -46,9 +50,12 @@ public class Weights {
     }
 
     public static double getLightPathEdgeCost(LightPath lp) {
-        return 1 + lp.getPathElement().getTraversedEdges().size() * 10e-7;
+        /** MinLP */ /** MinHops */
+//        return 1 + lp.getPathElement().getTraversedEdges().size() * 10e-7;
+        /** MinTHP*/
 //        return lp.getPathElement().getTraversedEdges().size();
-//        return lp.getNumberOfMiniGridsUsedAlongLP();
+        /** LB*/
+        return lp.getNumberOfMiniGridsUsedAlongLP();
     }
 
     public static double getTransponderEdgeCost() {
