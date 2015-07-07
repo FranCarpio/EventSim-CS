@@ -28,16 +28,22 @@ public class Connection {
      */
     private boolean isUnKnown;
 
+    /**
+     * Integer to specify at which mini grid (starting from) the connection is allocated
+     */
+    private int miniGrid;
+
     private static final Logger log = LoggerFactory.getLogger(Connection.class);
 
     /**
      * Constructor class
      */
-    public Connection(double startingTime, double holdingTime, double bw, boolean isUnKnown) {
+    public Connection(double startingTime, double holdingTime, double bw, boolean isUnKnown, int miniGrid) {
         this.startingTime = startingTime;
         this.holdingTime = holdingTime;
         this.bw = bw;
         this.isUnKnown = isUnKnown;
+        this.miniGrid = miniGrid;
     }
 
     /**
@@ -73,5 +79,9 @@ public class Connection {
 
     public double getStartingTime() {
         return startingTime;
+    }
+
+    public int getMiniGrid() {
+        return miniGrid;
     }
 }

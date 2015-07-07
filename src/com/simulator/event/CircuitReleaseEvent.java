@@ -50,8 +50,8 @@ public class CircuitReleaseEvent extends Event {
         for (int i = 0; i < NetworkState.getListOfLightPaths().size(); i++) {
             LightPath lp = NetworkState.getListOfLightPaths().get(i);
             if (lp.getConnectionMap().containsKey(connectionToRelease.getStartingTime())) {
-//                lp.removeConnectionOnLeftSide(connectionToRelease);
-                lp.removeConnectionOnRightSide(connectionToRelease);
+//                lp.removeConnectionAndCompress(connectionToRelease);
+                lp.removeConnectionAndCompress(connectionToRelease);
                 if (lp.getConnectionMap().isEmpty()) {
                     /**remove guard bands and delete light path*/
                     lp.releaseAllMiniGrids();

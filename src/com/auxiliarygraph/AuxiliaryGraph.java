@@ -55,7 +55,7 @@ public class AuxiliaryGraph {
                 List<Integer> freeMiniGrids = NetworkState.getFiberLink(e.getEdgeID()).getFreeMiniGrids(bwWithGB);
                 if (freeMiniGrids.size() >= bwWithGB)
                     for (Integer i : freeMiniGrids)
-                        listOfSE.add(new SpectrumEdge(e, i, bw));
+                        listOfSE.add(new SpectrumEdge(e, i, p.getPathElement().getTraversedEdges().size()));
             }
 
         /** For each pre-existing lightpath ...*/
@@ -64,19 +64,6 @@ public class AuxiliaryGraph {
             if (lp.canBeExpandedLeft(bw) || lp.canBeExpandedRight(bw))
                 listOfLPE.add(new LightPathEdge(lp));
     }
-
-    public double addTransponderCost() {
-        double transponderCost = 0;
-
-        if (bwWithGB / NetworkState.getTxCapacityOfTransponders() == 0)
-            transponderCost += Weights.getTransponderEdgeCost() * 2;
-        else {
-            transponderCost += Weights.getTransponderEdgeCost() * 2 * bwWithGB / NetworkState.getTxCapacityOfTransponders();
-        }
-
-        return transponderCost;
-    }
-
 
     public boolean runShortestPathAlgorithm(List<Path> listOfCandidatePaths) {
 
@@ -127,12 +114,12 @@ public class AuxiliaryGraph {
 
         /**Add transponder edges costs*/
         if (!listOfSpectrumEdges.isEmpty()) {
-            layerCost += addTransponderCost();
+            layerCost += Weights.getTransponderEdgeCost();
             for (int i = 1; i < listOfSpectrumEdges.size() - 1; i++) {
                 if (listOfSpectrumEdges.get(i).getEdgeElement().equals(listOfSpectrumEdges.get(i - 1).getEdgeElement()))
                     continue;
                 if (!listOfSpectrumEdges.get(i).getEdgeElement().getSourceVertex().equals(listOfSpectrumEdges.get(i - 1).getEdgeElement().getDestinationVertex()))
-                    layerCost += addTransponderCost();
+                    layerCost += Weights.getTransponderEdgeCost();
             }
         }
 
@@ -160,7 +147,7 @@ public class AuxiliaryGraph {
         Set<LightPath> newLightPaths = new HashSet<>();
         List<SpectrumEdge> selectedSpectrumEdges = new ArrayList<>();
 
-        newConnection = new Connection(currentTime, ht, bw, feature);
+        newConnection = new Connection(currentTime, ht, bw, feature, miniGrid);
 
         List<LightPathEdge> selectedLightPathEdges = getLightPathEdges(path, miniGrid);
 

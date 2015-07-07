@@ -82,6 +82,9 @@ public class LightPath {
 
     public boolean canBeExpandedRight(int bw) {
 
+        if (bw > NetworkState.getTransponderCapacity() - miniGridIds.size())
+            return false;
+
         for (EdgeElement e : pathElement.getTraversedEdges())
             if (!NetworkState.getFiberLink(e.getEdgeID()).areNextMiniGridsAvailable(miniGridIds.get(miniGridIds.size() - 1) + 1, bw))
                 return false;
@@ -89,6 +92,9 @@ public class LightPath {
     }
 
     public boolean canBeExpandedLeft(int bw) {
+
+        if (bw > NetworkState.getTransponderCapacity() - miniGridIds.size())
+            return false;
 
         for (EdgeElement e : pathElement.getTraversedEdges())
             if (!NetworkState.getFiberLink(e.getEdgeID()).arePreviousMiniGridsAvailable(miniGridIds.get(0) - 1, bw))
@@ -138,11 +144,11 @@ public class LightPath {
 
     }
 
-    public void removeConnectionOnRightSide(Connection connection) {
+    public void removeConnectionAndCompress(Connection connection) {
 
         connectionMap.remove(connection.getStartingTime());
 
-        int lastMiniGrid = miniGridIds.size()-1;
+        int lastMiniGrid = miniGridIds.size() - 1;
         for (int i = lastMiniGrid; i > lastMiniGrid - connection.getBw(); i--)
             for (EdgeElement e : pathElement.getTraversedEdges())
                 NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
@@ -157,5 +163,7 @@ public class LightPath {
 
     }
 
-
+    public int getFirstMiniGrid() {
+        return miniGridIds.get(0);
+    }
 }

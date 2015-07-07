@@ -13,9 +13,9 @@ public class SpectrumEdge {
     private EdgeElement edgeElement;
     private double cost;
 
-    public SpectrumEdge(EdgeElement edgeElement, int spectrumLayerIndex, int bw) {
+    public SpectrumEdge(EdgeElement edgeElement, int spectrumLayerIndex, int hopsOfThePath) {
 
-        cost = Weights.getSpectrumEdgeCost(edgeElement.getEdgeID(), spectrumLayerIndex, bw);
+        cost = Weights.getSpectrumEdgeCost(edgeElement.getEdgeID(), spectrumLayerIndex, hopsOfThePath);
         this.edgeElement = edgeElement;
         this.spectrumLayerIndex = spectrumLayerIndex;
     }

@@ -32,20 +32,19 @@ public class Weights {
         }
     }
 
-    public static double getSpectrumEdgeCost(String edgeID, int spectrumLayerIndex, int bw) {
+    public static double getSpectrumEdgeCost(String edgeID, int spectrumLayerIndex, int hopsOfThePath) {
         /** MinLP */ /** MinHops */
 //        return 1e-5 * spectrumLayerIndex;
         /** MinTHP*/
 //        return  1 + 1e-5 * spectrumLayerIndex;
         /** LB*/
-        return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * spectrumLayerIndex;
+//        return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * spectrumLayerIndex;
 
-//        if (bw == 4 && spectrumLayerIndex >= 128)
-//            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
-//        else if (bw == 10 && spectrumLayerIndex >= 180)
-//            return NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
-//        else
-//            return NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * spectrumLayerIndex;
+        if (hopsOfThePath == 2 && spectrumLayerIndex >= 67)
+            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
+        else if (hopsOfThePath == 3 && spectrumLayerIndex >= 133)
+            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
+        else return  1e-5 *  spectrumLayerIndex;
 
     }
 
@@ -59,7 +58,7 @@ public class Weights {
     }
 
     public static double getTransponderEdgeCost() {
-        return transponderEdgeCost;
+        return transponderEdgeCost * 2;
     }
 
 

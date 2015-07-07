@@ -1,5 +1,6 @@
 package com.auxiliarygraph;
 
+import com.auxiliarygraph.elements.Connection;
 import com.auxiliarygraph.elements.FiberLink;
 import com.auxiliarygraph.elements.LightPath;
 import com.auxiliarygraph.elements.Path;
@@ -20,7 +21,7 @@ public class NetworkState {
     private static Map<String, FiberLink> fiberLinksMap;
     private static List<LightPath> listOfLightPaths;
     private static List<Path> listOfPaths;
-    private static int txCapacityOfTransponders;
+    private static int transponderCapacity;
     private static int numOfMiniGridsPerGB;
 
     private static final Logger log = LoggerFactory.getLogger(NetworkState.class);
@@ -30,7 +31,7 @@ public class NetworkState {
         this.fiberLinksMap = new HashMap<>();
         this.listOfLightPaths = new ArrayList<>();
         this.listOfPaths = new ArrayList<>();
-        this.txCapacityOfTransponders = txCapacityOfTransponders / granularity;
+        this.transponderCapacity = txCapacityOfTransponders / granularity;
         this.numOfMiniGridsPerGB = numOfMiniGridsPerGB;
 
         for (PathElement pe : setOfPathElements)
@@ -50,9 +51,9 @@ public class NetworkState {
             for (int i = 0; i < vertexElements.size() - 1; i++)
                 for (int j = i + 1; j < vertexElements.size(); j++) {
                     List<LightPath> tmpListOfLP = getListOfLightPaths(vertexElements.get(i), vertexElements.get(j));
-                    for(LightPath lp:tmpListOfLP)
-                        if(!listOfLightPaths.contains(lp))
-                             listOfLightPaths.add(lp);
+                    for (LightPath lp : tmpListOfLP)
+                        if (!listOfLightPaths.contains(lp))
+                            listOfLightPaths.add(lp);
                 }
         }
 
@@ -64,7 +65,7 @@ public class NetworkState {
 
         for (LightPath lp : listOfLightPaths)
             if (lp.getPathElement().getSource().equals(src) && lp.getPathElement().getDestination().equals(dst))
-                    lightPaths.add(lp);
+                lightPaths.add(lp);
 
         return lightPaths;
     }
@@ -78,14 +79,6 @@ public class NetworkState {
         return null;
     }
 
-    public static FiberLink getFiberLink(String edgeID) {
-        return fiberLinksMap.get(edgeID);
-    }
-
-    public static Map<String, FiberLink> getFiberLinksMap() {
-        return fiberLinksMap;
-    }
-
     public static List<Path> getListOfPaths(String src, String dst) {
 
         List<Path> listOfCandidatePaths = new ArrayList<>();
@@ -96,12 +89,34 @@ public class NetworkState {
         return listOfCandidatePaths;
     }
 
+    public void applyDefragmentation(LightPath leavingLP, Connection leavingConnection) {
+
+        Set<LightPath> candidateLightPathsToReconfigure = new HashSet<>();
+
+        for (LightPath lp : listOfLightPaths)
+            if (lp.getFirstMiniGrid() > leavingConnection.getMiniGrid())
+                for (EdgeElement e : leavingLP.getPathElement().getTraversedEdges())
+                    if (lp.getPathElement().isLinktraversed(e))
+                        candidateLightPathsToReconfigure.add(lp);
+
+
+
+    }
+
+    public static FiberLink getFiberLink(String edgeID) {
+        return fiberLinksMap.get(edgeID);
+    }
+
+    public static Map<String, FiberLink> getFiberLinksMap() {
+        return fiberLinksMap;
+    }
+
     public static List<LightPath> getListOfLightPaths() {
         return listOfLightPaths;
     }
 
-    public static int getTxCapacityOfTransponders() {
-        return txCapacityOfTransponders;
+    public static int getTransponderCapacity() {
+        return transponderCapacity;
     }
 
     public static int getNumOfMiniGridsPerGB() {
