@@ -3,6 +3,7 @@ package com.auxiliarygraph;
 import com.auxiliarygraph.edges.LightPathEdge;
 import com.auxiliarygraph.edges.SpectrumEdge;
 import com.auxiliarygraph.elements.Connection;
+import com.auxiliarygraph.elements.FiberLink;
 import com.auxiliarygraph.elements.LightPath;
 import com.auxiliarygraph.elements.Path;
 import com.graph.elements.edge.EdgeElement;
@@ -233,5 +234,21 @@ public class AuxiliaryGraph {
 
     public Connection getNewConnection() {
         return newConnection;
+    }
+
+
+    /**
+     * Experimental
+     */
+
+    public double applyCorrectorFactor(Path p, int minigrid) {
+
+        double correctorFactor = 1;
+        for (FiberLink fl : NetworkState.getNeighborsFiberLinks(p.getPathElement().getSource(), p.getPathElement().getDestination()))
+            for (int i = minigrid; i < minigrid + bwWithGB; i++)
+                if (fl.getMiniGrid(minigrid) != 0)
+                    correctorFactor -= 0.1;
+
+        return correctorFactor;
     }
 }

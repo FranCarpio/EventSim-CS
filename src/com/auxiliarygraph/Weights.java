@@ -38,13 +38,13 @@ public class Weights {
         /** MinTHP*/
 //        return  1 + 1e-5 * spectrumLayerIndex;
         /** LB*/
-//        return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * spectrumLayerIndex;
+        return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * spectrumLayerIndex;
 
-        if (hopsOfThePath == 2 && spectrumLayerIndex >= 67)
-            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
-        else if (hopsOfThePath == 3 && spectrumLayerIndex >= 133)
-            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
-        else return  1e-5 *  spectrumLayerIndex;
+//        if (hopsOfThePath == 2 && spectrumLayerIndex >= 67)
+//            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
+//        else if (hopsOfThePath == 3 && spectrumLayerIndex >= 133)
+//            return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 * (double) spectrumLayerIndex / 1000;
+//        else return  NetworkState.getFiberLink(edgeID).getNumberOfMiniGridsUsed() + 1e-5 *  spectrumLayerIndex;
 
     }
 

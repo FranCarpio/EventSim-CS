@@ -5,15 +5,15 @@ nsf-network.txt
 # Max number of total request events before to stop the simulation
 1000000
 # Number of simulations
-1
-# Spectrum width (Ghz)
-1000
+3
 # g: grid granularity (Ghz)
 5
+# Modulation format (bits/s/Hz)
+2
 # B: number of mini-grids consumed by a guard band
 2
 # C: transmission capacity of transponders (Ghz)
-50
+1000
 # M: maximum allowed number of reserved mini-grids
 10
 # Seeds

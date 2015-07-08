@@ -8,6 +8,7 @@ import com.inputdata.elements.Source;
 import com.inputdata.elements.TrafficClass;
 import com.inputdata.elements.TrafficDemand;
 import com.inputdata.reader.ImportTopologyFromSNDFile;
+import com.launcher.SimulatorParameters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +42,6 @@ public class InputParameters {
 
         /** Import traffic matrix*/
         setTrafficDemands();
-
-        /** Read network input data*/
-//        readNetworkParameters();
-
-        /** Set nodes */
-//        setNodes(0);
     }
 
     /**
@@ -65,7 +60,7 @@ public class InputParameters {
         String[] connectionFeature = parameters.get(5).trim().split(" ");
         for (int i = 0; i < numberOfPortClasses; i++) {
             String[] ht = holdingTimes[i].split("-");
-            listOfTrafficClasses.add(new TrafficClass(i, Double.parseDouble(bandwidths[i]), ht[0], Double.parseDouble(ht[1]), Double.parseDouble(ht[2]), Double.parseDouble(connectionFeature[i]), Double.parseDouble(scaling[i])));
+            listOfTrafficClasses.add(new TrafficClass(i, Double.parseDouble(bandwidths[i]), ht[0], Double.parseDouble(ht[1]), Double.parseDouble(ht[2]), Double.parseDouble(connectionFeature[i]), Double.parseDouble(scaling[i + (SimulatorParameters.getNumberOfRuns()* SimulatorParameters.get_runNumber())])));
         }
     }
 

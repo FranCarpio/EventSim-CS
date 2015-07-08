@@ -5,6 +5,7 @@ import com.graph.elements.edge.params.EdgeParams;
 import com.graph.elements.edge.params.impl.BasicEdgeParams;
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
+import com.launcher.SimulatorParameters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,6 @@ import java.util.regex.Pattern;
 
 /**
  * Class to import SNDLib topology
- *
  */
 public class ImportTopologyFromSNDFile extends com.graph.topology.importers.ImportTopology {
 
@@ -56,10 +56,21 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
             }
 
             Matcher m = Pattern.compile("\\(([^)]+)\\)").matcher(temp);
+            String[] temp1 = new String[SimulatorParameters.getNumberOfRuns()];
+            int count = 0;
             while (m.find()) {
-                temp = m.group(1).trim();
+                temp1[count] = m.group(1).trim();
+                count++;
             }
-            parameters.add(temp);
+            if (count > 1) {
+                String tmp = "";
+                for (int i = 0; i < count; i++) {
+                    tmp += temp1[i]+" ";
+                }
+                parameters.add(tmp);
+            } else
+                parameters.add(temp1[0]);
+
         }
 
         // Read till we get to Source definition)
@@ -121,12 +132,12 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
 
             p = Pattern.compile("[a-zA-Z0-9\\.]+");
             m = p.matcher(temp);
-            String[] temp1 = new String[3];
+            String[] temp1 = new String[7];
             int count = 0;
             while (m.find()) {
                 temp1[count] = m.group(0);
                 count++;
-                if (count == 3)
+                if (count == 7)
                     break;
             }
 
@@ -138,10 +149,7 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
             EdgeElement edge2 = new EdgeElement(temp1[0] + ".2", vertex2, vertex1,
                     graph);
 
-            // System.out.println("Edge Added: Edge ID=" + edge.getEdgeID()
-            // + ", sourceID=" + vertex1.getVertexID() +
-            // ", destinationID = " + vertex2.getVertexID());
-            // Compute delay using X and Y Coords from Vertices
+
             double distance = Math.sqrt(Math.pow(vertex1.getXCoord()
                     - vertex2.getXCoord(), 2)
                     + Math
@@ -149,9 +157,9 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
                             2));
 
             double delay = distance / 29.9792458; // (in ms)
-            // @TODO import inputdata for link weight and delay from brite
-            EdgeParams params1 = new BasicEdgeParams(edge1, delay, 1, 40);
-            EdgeParams params2 = new BasicEdgeParams(edge2, delay, 1, 40);
+
+            EdgeParams params1 = new BasicEdgeParams(edge1, delay, 1, Double.valueOf(temp1[5]));
+            EdgeParams params2 = new BasicEdgeParams(edge2, delay, 1, Double.valueOf(temp1[5]));
             edge1.setEdgeParams(params1);
             edge2.setEdgeParams(params2);
             graph.addEdge(edge1);

@@ -88,8 +88,6 @@ public class Generator {
         destinationDistribution = new ContinuousUniformDistribution(0, 1.0, SimulatorParameters.getSeed());
         portDistribution = new ContinuousUniformDistribution(0.0, 1.0, SimulatorParameters.getSeed());
         unknownDistribution = new ContinuousUniformDistribution(0.0, 1.0, SimulatorParameters.getSeed());
-        /**corrector*/
-        lambda = lambda / 10;
         requestDistribution = new ExponentialDistribution(lambda, seedForArrivalRNG);
     }
 

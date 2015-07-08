@@ -3,6 +3,7 @@ package com.simulator.event;
 import com.auxiliarygraph.AuxiliaryGraph;
 import com.filemanager.Results;
 import com.inputdata.elements.TrafficClass;
+import com.launcher.SimulatorParameters;
 import com.simulator.Scheduler;
 import com.simulator.elements.Generator;
 import com.simulator.elements.TrafficFlow;
@@ -55,8 +56,9 @@ public class CircuitRequestEvent extends Event {
         /** Get a random destination following a uniform distribution */
         TrafficFlow selectedFlow = generator.getRandomFlow(trafficClass.getType());
 
+        int numberOfMiniGrids = (int) (trafficClass.getBw() / SimulatorParameters.getModulationFormat()) / SimulatorParameters.getGridGranularity();
         /** Create a new Auxiliary Graph*/
-        AuxiliaryGraph auxiliaryGraph = new AuxiliaryGraph(generator.getVertex().getVertexID(), selectedFlow.getDstNode().getVertexID(), (int) trafficClass.getBw(), Scheduler.currentTime(), holdingTime, isUnKnown);
+        AuxiliaryGraph auxiliaryGraph = new AuxiliaryGraph(generator.getVertex().getVertexID(), selectedFlow.getDstNode().getVertexID(), numberOfMiniGrids, Scheduler.currentTime(), holdingTime, isUnKnown);
 
         /**If path is found, then add release event*/
         if (auxiliaryGraph.runShortestPathAlgorithm(selectedFlow.getListOfPaths())) {

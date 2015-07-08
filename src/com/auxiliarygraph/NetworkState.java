@@ -8,6 +8,7 @@ import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.path.PathElement;
+import com.inputdata.InputParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class NetworkState {
 
     private static final Logger log = LoggerFactory.getLogger(NetworkState.class);
 
-    public NetworkState(Gcontroller graph, int granularity, int spectrumWidth, int txCapacityOfTransponders, int numOfMiniGridsPerGB, Set<PathElement> setOfPathElements) {
+    public NetworkState(Gcontroller graph, int granularity, int txCapacityOfTransponders, int numOfMiniGridsPerGB, Set<PathElement> setOfPathElements) {
 
         this.fiberLinksMap = new HashMap<>();
         this.listOfLightPaths = new ArrayList<>();
@@ -38,7 +39,7 @@ public class NetworkState {
             listOfPaths.add(new Path(pe));
 
         for (EdgeElement edgeElement : graph.getEdgeSet())
-            fiberLinksMap.put(edgeElement.getEdgeID(), new FiberLink(granularity, spectrumWidth, edgeElement));
+            fiberLinksMap.put(edgeElement.getEdgeID(), new FiberLink(granularity, 10, edgeElement));
 
         new Weights();
     }
@@ -89,20 +90,6 @@ public class NetworkState {
         return listOfCandidatePaths;
     }
 
-    public void applyDefragmentation(LightPath leavingLP, Connection leavingConnection) {
-
-        Set<LightPath> candidateLightPathsToReconfigure = new HashSet<>();
-
-        for (LightPath lp : listOfLightPaths)
-            if (lp.getFirstMiniGrid() > leavingConnection.getMiniGrid())
-                for (EdgeElement e : leavingLP.getPathElement().getTraversedEdges())
-                    if (lp.getPathElement().isLinktraversed(e))
-                        candidateLightPathsToReconfigure.add(lp);
-
-
-
-    }
-
     public static FiberLink getFiberLink(String edgeID) {
         return fiberLinksMap.get(edgeID);
     }
@@ -121,5 +108,28 @@ public class NetworkState {
 
     public static int getNumOfMiniGridsPerGB() {
         return numOfMiniGridsPerGB;
+    }
+
+    /** Experimental */
+    public void applyDefragmentation(LightPath leavingLP, Connection leavingConnection) {
+
+        Set<LightPath> candidateLightPathsToReconfigure = new HashSet<>();
+
+        for (LightPath lp : listOfLightPaths)
+            if (lp.getFirstMiniGrid() > leavingConnection.getMiniGrid())
+                for (EdgeElement e : leavingLP.getPathElement().getTraversedEdges())
+                    if (lp.getPathElement().isLinktraversed(e))
+                        candidateLightPathsToReconfigure.add(lp);
+
+    }
+
+    public static Set<FiberLink> getNeighborsFiberLinks (VertexElement src, VertexElement dst) {
+
+        Set<FiberLink> neighboursFiberLinks = new HashSet<>();
+        for (EdgeElement e : InputParameters.getGraph().getEdgeSet())
+            if (e.getDestinationVertex().getVertexID().equals(src.getVertexID()) || e.getSourceVertex().getVertexID().equals(dst.getVertexID()))
+                neighboursFiberLinks.add(fiberLinksMap.get(e.getEdgeID()));
+
+        return neighboursFiberLinks;
     }
 }

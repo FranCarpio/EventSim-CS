@@ -46,7 +46,7 @@ public class Source {
         lambdaIJ = new ArrayList<>();
         for (int i = 0; i < InputParameters.getNumberOfTrafficClasses(); i++)
             for (TrafficDemand listOfTrafficDemand : listOfTrafficDemands)
-                lambdaIJ.add((listOfTrafficDemand.getTrafficValues().get(i) + (InputParameters.getTrafficClasses().get(i).getScalingFactor() * runNumber)) / InputParameters.getTrafficClasses().get(i).getMeanHoldingTime());
+                lambdaIJ.add(listOfTrafficDemand.getTrafficValues().get(i) * InputParameters.getTrafficClasses().get(i).getScalingFactor() / InputParameters.getTrafficClasses().get(i).getMeanHoldingTime());
 
         lambdaI = new ArrayList<>();
         for (int i = 0; i < InputParameters.getNumberOfTrafficClasses(); i++) {

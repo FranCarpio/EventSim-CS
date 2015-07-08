@@ -30,7 +30,7 @@ public class SimulatorParameters {
     private static int numberOfRuns;
     private static List<byte[]> listOfSeeds;
     private static int seedCounter;
-    private static int spectrumWidth;
+    private static int modulationFormat;
     private static int gridGranularity;
     private static int numOfMiniGridsPerGB;
     private static int txCapacityOfTransponders;
@@ -46,7 +46,7 @@ public class SimulatorParameters {
 
         /** Input network from a SNDLib file */
         new InputParameters(networkFile);
-        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
+        new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
         runSimulation();
     }
 
@@ -72,7 +72,7 @@ public class SimulatorParameters {
 
         InputParameters.readNetworkParameters();
         InputParameters.setNodes(SimulatorParameters.get_runNumber());
-        new NetworkState(InputParameters.getGraph(), gridGranularity, spectrumWidth, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
+        new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
         listOfGenerators = new ArrayList<>();
         for (Source s : InputParameters.getListOfSources())
             listOfGenerators.add(new Generator(s.getVertex(), s.getListOfTrafficDemands(), s.getArrivalRate(), s.getTrafficClassProb(), s.getDestinationProb()));
@@ -146,10 +146,10 @@ public class SimulatorParameters {
                         numberOfRuns = Integer.parseInt(line);
                         break;
                     case 4:
-                        spectrumWidth = Integer.parseInt(line);
+                        gridGranularity = Integer.parseInt(line);
                         break;
                     case 5:
-                        gridGranularity = Integer.parseInt(line);
+                        modulationFormat = Integer.parseInt(line);
                         break;
                     case 6:
                         numOfMiniGridsPerGB = Integer.parseInt(line);
@@ -201,4 +201,15 @@ public class SimulatorParameters {
         return _runNumber;
     }
 
+    public static int getModulationFormat() {
+        return modulationFormat;
+    }
+
+    public static int getGridGranularity() {
+        return gridGranularity;
+    }
+
+    public static int getNumberOfRuns() {
+        return numberOfRuns;
+    }
 }
