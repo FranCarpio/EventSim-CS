@@ -5,7 +5,7 @@ nsf-network.txt
 # Max number of total request events before to stop the simulation
 1000000
 # Number of simulations
-3
+4
 # g: grid granularity (Ghz)
 5
 # Modulation format (bits/s/Hz)

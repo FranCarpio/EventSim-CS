@@ -71,7 +71,7 @@ public class SimulatorParameters {
         new Results();
 
         InputParameters.readNetworkParameters();
-        InputParameters.setNodes(SimulatorParameters.get_runNumber());
+        InputParameters.setNodes();
         new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
         listOfGenerators = new ArrayList<>();
         for (Source s : InputParameters.getListOfSources())

@@ -26,22 +26,20 @@ public class Source {
      *
      * @param vertex               vertex element object
      * @param listOfTrafficDemands list of traffic demands of the source
-     * @param runNumber            the current run number for calculation of lambda (in relation with the scaling factor)
      */
-    public Source(VertexElement vertex, List<TrafficDemand> listOfTrafficDemands, int runNumber) {
+    public Source(VertexElement vertex, List<TrafficDemand> listOfTrafficDemands) {
         this.vertex = vertex;
         this.listOfTrafficDemands.addAll(listOfTrafficDemands);
         this.trafficClassProb = new ArrayList<>();
         this.destinationProb = new ArrayList<>();
-        initializeRNGForArrivalProcess(runNumber);
+        initializeRNGForArrivalProcess();
     }
 
     /**
      * Initialize distribution for arrival process
      *
-     * @param runNumber the current run number for calculation of lambda (in relation with the scaling factor)
      */
-    public void initializeRNGForArrivalProcess(int runNumber) {
+    public void initializeRNGForArrivalProcess() {
 
         lambdaIJ = new ArrayList<>();
         for (int i = 0; i < InputParameters.getNumberOfTrafficClasses(); i++)

@@ -67,9 +67,8 @@ public class InputParameters {
     /**
      * Set the nodes in the network for the statistics
      *
-     * @param runNumber the current run number for calculation of lambda (in relation with the scaling factor)
      */
-    public static void setNodes(int runNumber) {
+    public static void setNodes() {
         listOfSources = new ArrayList<>();
         List<TrafficDemand> listOfTrafficDemandsPerGenerator = new ArrayList<>();
         List<TrafficDemand> listOfTrafficDemands = InputParameters.getTrafficDemands();
@@ -78,13 +77,13 @@ public class InputParameters {
 
             if (i == listOfTrafficDemands.size() - 1) {
                 listOfTrafficDemandsPerGenerator.add(listOfTrafficDemands.get(i));
-                listOfSources.add(new Source(listOfTrafficDemands.get(i).getSource(), listOfTrafficDemandsPerGenerator, runNumber));
+                listOfSources.add(new Source(listOfTrafficDemands.get(i).getSource(), listOfTrafficDemandsPerGenerator));
                 break;
             } else if (listOfTrafficDemands.get(i).getSource().equals(listOfTrafficDemands.get(i + 1).getSource())) {
                 listOfTrafficDemandsPerGenerator.add(listOfTrafficDemands.get(i));
             } else {
                 listOfTrafficDemandsPerGenerator.add(listOfTrafficDemands.get(i));
-                listOfSources.add(new Source(listOfTrafficDemands.get(i).getSource(), listOfTrafficDemandsPerGenerator, runNumber));
+                listOfSources.add(new Source(listOfTrafficDemands.get(i).getSource(), listOfTrafficDemandsPerGenerator));
                 listOfTrafficDemandsPerGenerator.clear();
             }
         }

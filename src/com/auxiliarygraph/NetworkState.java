@@ -39,7 +39,7 @@ public class NetworkState {
             listOfPaths.add(new Path(pe));
 
         for (EdgeElement edgeElement : graph.getEdgeSet())
-            fiberLinksMap.put(edgeElement.getEdgeID(), new FiberLink(granularity, 10, edgeElement));
+            fiberLinksMap.put(edgeElement.getEdgeID(), new FiberLink(granularity, (int) edgeElement.getEdgeParams().getMaxCapacity(), edgeElement));
 
         new Weights();
     }
@@ -110,7 +110,9 @@ public class NetworkState {
         return numOfMiniGridsPerGB;
     }
 
-    /** Experimental */
+    /**
+     * Experimental
+     */
     public void applyDefragmentation(LightPath leavingLP, Connection leavingConnection) {
 
         Set<LightPath> candidateLightPathsToReconfigure = new HashSet<>();
@@ -123,7 +125,7 @@ public class NetworkState {
 
     }
 
-    public static Set<FiberLink> getNeighborsFiberLinks (VertexElement src, VertexElement dst) {
+    public static Set<FiberLink> getNeighborsFiberLinks(VertexElement src, VertexElement dst) {
 
         Set<FiberLink> neighboursFiberLinks = new HashSet<>();
         for (EdgeElement e : InputParameters.getGraph().getEdgeSet())
