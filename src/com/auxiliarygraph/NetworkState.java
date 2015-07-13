@@ -27,7 +27,7 @@ public class NetworkState {
 
     private static final Logger log = LoggerFactory.getLogger(NetworkState.class);
 
-    public NetworkState(Gcontroller graph, int granularity, int txCapacityOfTransponders, int numOfMiniGridsPerGB, Set<PathElement> setOfPathElements) {
+    public NetworkState(Gcontroller graph, int granularity, int txCapacityOfTransponders, int numOfMiniGridsPerGB, Set<PathElement> setOfPathElements, int policy) {
 
         this.fiberLinksMap = new HashMap<>();
         this.listOfLightPaths = new ArrayList<>();
@@ -41,7 +41,7 @@ public class NetworkState {
         for (EdgeElement edgeElement : graph.getEdgeSet())
             fiberLinksMap.put(edgeElement.getEdgeID(), new FiberLink(granularity, (int) edgeElement.getEdgeParams().getMaxCapacity(), edgeElement));
 
-        new Weights();
+        new Weights(policy);
     }
 
     public static List<LightPath> getListOfLightPaths(List<Path> listOfCandidatePaths) {

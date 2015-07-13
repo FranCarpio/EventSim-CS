@@ -37,6 +37,7 @@ public class SimulatorParameters {
     private static int maxReservedMiniGrids;
     private static List<Generator> listOfGenerators;
     private static int _runNumber = -1;
+    private static int policy;
     private static final Logger log = LoggerFactory.getLogger(SimulatorParameters.class);
 
     /**
@@ -46,7 +47,7 @@ public class SimulatorParameters {
 
         /** Input network from a SNDLib file */
         new InputParameters(networkFile);
-        new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
+        new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()), policy);
         runSimulation();
     }
 
@@ -72,7 +73,7 @@ public class SimulatorParameters {
 
         InputParameters.readNetworkParameters();
         InputParameters.setNodes();
-        new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()));
+        new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()), policy);
         listOfGenerators = new ArrayList<>();
         for (Source s : InputParameters.getListOfSources())
             listOfGenerators.add(new Generator(s.getVertex(), s.getListOfTrafficDemands(), s.getArrivalRate(), s.getTrafficClassProb(), s.getDestinationProb()));
@@ -161,6 +162,9 @@ public class SimulatorParameters {
                         maxReservedMiniGrids = Integer.parseInt(line);
                         break;
                     case 9:
+                        policy = Integer.parseInt(line);
+                        break;
+                    case 10:
 //                        SeedGenerator seedGenerator = new SecureRandomSeedGenerator();
 //                        byte [] seed;
 //                        try {

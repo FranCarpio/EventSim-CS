@@ -60,7 +60,7 @@ public class InputParameters {
         String[] connectionFeature = parameters.get(5).trim().split(" ");
         for (int i = 0; i < numberOfPortClasses; i++) {
             String[] ht = holdingTimes[i].split("-");
-            listOfTrafficClasses.add(new TrafficClass(i, Double.parseDouble(bandwidths[i]), ht[0], Double.parseDouble(ht[1]), Double.parseDouble(ht[2]), Double.parseDouble(connectionFeature[i]), Double.parseDouble(scaling[i + (SimulatorParameters.getNumberOfRuns()* SimulatorParameters.get_runNumber())])));
+            listOfTrafficClasses.add(new TrafficClass(i, Double.parseDouble(bandwidths[i]), ht[0], Double.parseDouble(ht[1]), Double.parseDouble(ht[2]), Double.parseDouble(connectionFeature[i]), Double.parseDouble(scaling[i + ((SimulatorParameters.getNumberOfRuns() - 1)* SimulatorParameters.get_runNumber())])));
         }
     }
 

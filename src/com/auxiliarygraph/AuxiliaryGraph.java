@@ -41,7 +41,7 @@ public class AuxiliaryGraph {
         listOfLPE = new ArrayList<>();
         listOfSE = new ArrayList<>();
         this.bw = b;
-        this.bwWithGB = bw + /**2 ***/GUARD_BAND;
+        this.bwWithGB = bw + GUARD_BAND;
         this.currentTime = currentTime;
         this.ht = ht;
         this.feature = feature;
@@ -241,13 +241,13 @@ public class AuxiliaryGraph {
      * Experimental
      */
 
-    public double applyCorrectorFactor(Path p, int minigrid) {
+    public double applyCorrectorFactor(Path p, int miniGrid) {
 
-        double correctorFactor = 1;
+        double correctorFactor = 0;
         for (FiberLink fl : NetworkState.getNeighborsFiberLinks(p.getPathElement().getSource(), p.getPathElement().getDestination()))
-            for (int i = minigrid; i < minigrid + bwWithGB; i++)
-                if (fl.getMiniGrid(minigrid) != 0)
-                    correctorFactor -= 0.1;
+            for (int i = miniGrid; i < miniGrid + bwWithGB; i++)
+                if (fl.getMiniGrid(miniGrid) != 0)
+                    correctorFactor += 1;
 
         return correctorFactor;
     }
