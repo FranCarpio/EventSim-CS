@@ -3,6 +3,7 @@ package com.auxiliarygraph.elements;
 import com.auxiliarygraph.NetworkState;
 import com.graph.elements.edge.EdgeElement;
 import com.graph.path.PathElement;
+import com.launcher.SimulatorParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ public class LightPath {
     private Map<Double, Connection> connectionMap;
     private static final Logger log = LoggerFactory.getLogger(LightPath.class);
     private final int GUARD_BANDS;
+    private static final int DEFRAG_METHOD = SimulatorParameters.getDeFragmentationMethod();
 
     public LightPath(PathElement pathElement, int initialMiniGrid, int bwWithGB, int bw, Connection connection) {
         this.pathElement = pathElement;
@@ -131,22 +133,18 @@ public class LightPath {
                 NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(i);
     }
 
-    public void removeConnectionOnLeftSide(Connection connection) {
+    public void removeConnectionAndApplyDeFrag(Connection connection) {
 
         connectionMap.remove(connection.getStartingTime());
 
-        for (int i = 0; i < connection.getBw(); i++)
-            for (EdgeElement e : pathElement.getTraversedEdges())
-                NetworkState.getFiberLink(e.getEdgeID()).setFreeMiniGrid(miniGridIds.get(i));
-
-        for (int i = 0; i < connection.getBw(); i++)
-            miniGridIds.remove(0);
-
+        switch (DEFRAG_METHOD) {
+            case 0:
+                applyCompressionByRightSide(connection);
+                break;
+        }
     }
 
-    public void removeConnectionAndCompress(Connection connection) {
-
-        connectionMap.remove(connection.getStartingTime());
+    public void applyCompressionByRightSide(Connection connection){
 
         int lastMiniGrid = miniGridIds.size() - 1;
         for (int i = lastMiniGrid; i > lastMiniGrid - connection.getBw(); i--)
@@ -160,10 +158,5 @@ public class LightPath {
 
         for (int i = 0; i < connection.getBw(); i++)
             miniGridIds.remove(miniGridIds.size() - 1);
-
-    }
-
-    public int getFirstMiniGrid() {
-        return miniGridIds.get(0);
     }
 }

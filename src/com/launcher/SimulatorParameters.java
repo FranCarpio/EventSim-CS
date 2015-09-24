@@ -25,8 +25,8 @@ import java.util.*;
 public class SimulatorParameters {
 
     private static String networkFile;
-    private static double simulationTime;
     private static int numberOfTotalRequests;
+    private static int numberOfRequestForReports;
     private static int numberOfRuns;
     private static List<byte[]> listOfSeeds;
     private static int seedCounter;
@@ -34,10 +34,10 @@ public class SimulatorParameters {
     private static int gridGranularity;
     private static int numOfMiniGridsPerGB;
     private static int txCapacityOfTransponders;
-    private static int maxReservedMiniGrids;
     private static List<Generator> listOfGenerators;
     private static int _runNumber = -1;
     private static int policy;
+    private static int deFragmentationMethod;
     private static final Logger log = LoggerFactory.getLogger(SimulatorParameters.class);
 
     /**
@@ -138,10 +138,10 @@ public class SimulatorParameters {
                         networkFile = line;
                         break;
                     case 1:
-                        simulationTime = Double.parseDouble(line);
+                        numberOfTotalRequests = Integer.parseInt(line);
                         break;
                     case 2:
-                        numberOfTotalRequests = Integer.parseInt(line);
+                        numberOfRequestForReports = Integer.parseInt(line);
                         break;
                     case 3:
                         numberOfRuns = Integer.parseInt(line);
@@ -159,20 +159,12 @@ public class SimulatorParameters {
                         txCapacityOfTransponders = Integer.parseInt(line);
                         break;
                     case 8:
-                        maxReservedMiniGrids = Integer.parseInt(line);
-                        break;
-                    case 9:
                         policy = Integer.parseInt(line);
                         break;
+                    case 9:
+                        deFragmentationMethod = Integer.parseInt(line);
+                        break;
                     case 10:
-//                        SeedGenerator seedGenerator = new SecureRandomSeedGenerator();
-//                        byte [] seed;
-//                        try {
-//                            seed = seedGenerator.generateSeed(16);
-//                            listOfSeeds.add(seed);
-//                        } catch (SeedException e) {
-//                            e.printStackTrace();
-//                        }
                         while (line != null) {
                             line = line.replaceAll("\\s+", "");
                             byte[] seed = new BigInteger(line, 2).toByteArray();
@@ -201,6 +193,10 @@ public class SimulatorParameters {
         return numberOfTotalRequests;
     }
 
+    public static int getNumberOfRequestForReports() {
+        return numberOfRequestForReports;
+    }
+
     public static int get_runNumber() {
         return _runNumber;
     }
@@ -215,5 +211,9 @@ public class SimulatorParameters {
 
     public static int getNumberOfRuns() {
         return numberOfRuns;
+    }
+
+    public static int getDeFragmentationMethod() {
+        return deFragmentationMethod;
     }
 }

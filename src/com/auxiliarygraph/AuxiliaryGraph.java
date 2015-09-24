@@ -236,19 +236,4 @@ public class AuxiliaryGraph {
         return newConnection;
     }
 
-
-    /**
-     * Experimental
-     */
-
-    public double applyCorrectorFactor(Path p, int miniGrid) {
-
-        double correctorFactor = 0;
-        for (FiberLink fl : NetworkState.getNeighborsFiberLinks(p.getPathElement().getSource(), p.getPathElement().getDestination()))
-            for (int i = miniGrid; i < miniGrid + bwWithGB; i++)
-                if (fl.getMiniGrid(miniGrid) != 0)
-                    correctorFactor += 1;
-
-        return correctorFactor;
-    }
 }

@@ -109,29 +109,4 @@ public class NetworkState {
     public static int getNumOfMiniGridsPerGB() {
         return numOfMiniGridsPerGB;
     }
-
-    /**
-     * Experimental
-     */
-    public void applyDefragmentation(LightPath leavingLP, Connection leavingConnection) {
-
-        Set<LightPath> candidateLightPathsToReconfigure = new HashSet<>();
-
-        for (LightPath lp : listOfLightPaths)
-            if (lp.getFirstMiniGrid() > leavingConnection.getMiniGrid())
-                for (EdgeElement e : leavingLP.getPathElement().getTraversedEdges())
-                    if (lp.getPathElement().isLinktraversed(e))
-                        candidateLightPathsToReconfigure.add(lp);
-
-    }
-
-    public static Set<FiberLink> getNeighborsFiberLinks(VertexElement src, VertexElement dst) {
-
-        Set<FiberLink> neighboursFiberLinks = new HashSet<>();
-        for (EdgeElement e : InputParameters.getGraph().getEdgeSet())
-            if (e.getDestinationVertex().getVertexID().equals(src.getVertexID()) || e.getSourceVertex().getVertexID().equals(dst.getVertexID()))
-                neighboursFiberLinks.add(fiberLinksMap.get(e.getEdgeID()));
-
-        return neighboursFiberLinks;
-    }
 }

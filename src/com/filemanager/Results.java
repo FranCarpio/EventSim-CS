@@ -77,7 +77,7 @@ public class Results {
     public static void writeLinkUtilizationResults() {
 
         linkRequestCounter++;
-        if (linkRequestCounter >= 1000) {
+        if (linkRequestCounter >= SimulatorParameters.getNumberOfRequestForReports()) {
             for (Map.Entry<String, FiberLink> entry : NetworkState.getFiberLinksMap().entrySet())
                 linkUtilizationWriteFile.write(entry.getValue().getEdgeElement().getSourceVertex().getVertexID()
                         .substring(1)
@@ -104,7 +104,7 @@ public class Results {
         for (Counter counter : flow.getListOfCounters())
             totalRequestCounter += counter.getFlowRequestCounter();
 
-        if (totalRequestCounter >= 100) {
+        if (totalRequestCounter >= SimulatorParameters.getNumberOfRequestForReports()) {
             for (int i = 0; i < flow.getListOfCounters().size(); i++) {
                 blockingWriteFile.write(gen.getVertex().getVertexID()
                         .substring(1)
