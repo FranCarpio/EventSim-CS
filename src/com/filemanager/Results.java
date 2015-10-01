@@ -3,6 +3,7 @@ package com.filemanager;
 import com.auxiliarygraph.NetworkState;
 import com.auxiliarygraph.elements.FiberLink;
 import com.auxiliarygraph.elements.LightPath;
+import com.inputdata.InputParameters;
 import com.launcher.SimulatorParameters;
 import com.simulator.Scheduler;
 import com.simulator.elements.Generator;
@@ -160,9 +161,12 @@ public class Results {
 
     public static void writeFiberLinkState() {
 
-        FiberLink fb = NetworkState.getFiberLinksMap().get("L4.2");
+        String[] param = SimulatorParameters.getFiberLinkStateParameter().split(" ");
+        String[] interval = param[0].split("-");
+        String[] nodes = param[1].split("-");
+        FiberLink fb = NetworkState.getFiberLink(InputParameters.getGraph().getConnectingEdge(nodes[0], nodes[1]).getEdgeID());
 
-        if (totalRequestCounter == 1000) {
+        if (totalRequestCounter >= Integer.parseInt(interval[0]) && totalRequestCounter < Integer.parseInt(interval[1])) {
             for (int i = 1; i <= fb.getTotalNumberOfMiniGrids(); i++) {
                 if (fb.getMiniGrid(i) == 0)
                     writeMiniGridState(fb, i, "free");

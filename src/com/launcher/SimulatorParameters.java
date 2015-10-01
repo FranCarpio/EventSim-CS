@@ -38,6 +38,7 @@ public class SimulatorParameters {
     private static int _runNumber = -1;
     private static int policy;
     private static int deFragmentationMethod;
+    private static String fiberLinkStateParameter;
     private static final Logger log = LoggerFactory.getLogger(SimulatorParameters.class);
 
     /**
@@ -165,6 +166,9 @@ public class SimulatorParameters {
                         deFragmentationMethod = Integer.parseInt(line);
                         break;
                     case 10:
+                        fiberLinkStateParameter = line;
+                        break;
+                    case 11:
                         while (line != null) {
                             line = line.replaceAll("\\s+", "");
                             byte[] seed = new BigInteger(line, 2).toByteArray();
@@ -215,5 +219,9 @@ public class SimulatorParameters {
 
     public static int getDeFragmentationMethod() {
         return deFragmentationMethod;
+    }
+
+    public static String getFiberLinkStateParameter() {
+        return fiberLinkStateParameter;
     }
 }
