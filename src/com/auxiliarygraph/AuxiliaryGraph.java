@@ -3,7 +3,6 @@ package com.auxiliarygraph;
 import com.auxiliarygraph.edges.LightPathEdge;
 import com.auxiliarygraph.edges.SpectrumEdge;
 import com.auxiliarygraph.elements.Connection;
-import com.auxiliarygraph.elements.FiberLink;
 import com.auxiliarygraph.elements.LightPath;
 import com.auxiliarygraph.elements.Path;
 import com.graph.elements.edge.EdgeElement;
@@ -130,15 +129,17 @@ public class AuxiliaryGraph {
         for (LightPathEdge lpe : listLightPathEdges)
             for (EdgeElement ee : lpe.getLightPath().getPathElement().getTraversedEdges())
                 counterPath++;
-        for (int i = 0; i < listOfSpectrumEdges.size() - 1; i++) {
+        /** Solved Bug HERE*/
+        for (int i = 0; i < listOfSpectrumEdges.size()/* - 1*/; i++) {
             if (i == 0)
                 counterPath++;
             else if (!listOfSpectrumEdges.get(i).getEdgeElement().equals(listOfSpectrumEdges.get(i - 1).getEdgeElement()))
                 counterPath++;
         }
 
+
         if (counterPath < p.getPathElement().getTraversedEdges().size())
-            layerCost = Double.MAX_VALUE;
+                layerCost = Double.MAX_VALUE;
 
         return layerCost;
     }

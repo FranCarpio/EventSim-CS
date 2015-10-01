@@ -2,6 +2,7 @@ package com.filemanager;
 
 import com.auxiliarygraph.NetworkState;
 import com.auxiliarygraph.elements.FiberLink;
+import com.auxiliarygraph.elements.LightPath;
 import com.launcher.SimulatorParameters;
 import com.simulator.Scheduler;
 import com.simulator.elements.Generator;
@@ -21,6 +22,7 @@ public class Results {
     private static WriteFile linkUtilizationWriteFile;
     private static WriteFile interArrivalWriteFile;
     private static WriteFile holdingTimeWriteFile;
+    private static WriteFile fiberLinkStateFile;
     private static int linkRequestCounter;
     private static int totalRequestCounter;
     private static final Logger log = LoggerFactory.getLogger(Results.class);
@@ -58,6 +60,12 @@ public class Results {
             holdingTimeWriteFile.write(MY_FORMAT.format(date) + "\n");
             holdingTimeWriteFile.write("Releases \n\n");
             holdingTimeWriteFile.write("S	D	T	K/U	ht(i)	simTime\n");
+
+            fiberLinkStateFile = new WriteFile("FiberLinkState-run-"
+                    + SimulatorParameters.get_runNumber(), false);
+            fiberLinkStateFile.write(MY_FORMAT.format(date) + "\n");
+            fiberLinkStateFile.write("Fiber Link State File \n\n");
+            fiberLinkStateFile.write("Fiber   ID      S       LP\n");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -149,5 +157,36 @@ public class Results {
                 + portType + "	" + interArrivalTime + "	"
                 + Scheduler.currentTime() + "\n");
     }
+
+    public static void writeFiberLinkState() {
+
+        FiberLink fb = NetworkState.getFiberLinksMap().get("L4.2");
+
+        if (totalRequestCounter == 1000) {
+            for (int i = 1; i <= fb.getTotalNumberOfMiniGrids(); i++) {
+                if (fb.getMiniGrid(i) == 0)
+                    writeMiniGridState(fb, i, "free");
+                else
+                    for (LightPath lp : NetworkState.getListOfLightPaths(fb.getEdgeElement()))
+                        if (lp.containsMiniGrid(i))
+                            writeMiniGridState(fb, i, lp.getPathElement().getVertexSequence());
+            }
+        }
+    }
+
+    public static void writeMiniGridState(FiberLink fb, int miniGridID, String pathSequence) {
+
+        fiberLinkStateFile.write(fb.getEdgeElement().getSourceVertex().getVertexID().substring(1)
+                + " "
+                + fb.getEdgeElement().getDestinationVertex().getVertexID().substring(1)
+                + "     "
+                + miniGridID
+                + "     "
+                + fb.getMiniGrid(miniGridID)
+                + "     "
+                + pathSequence
+                + "\n");
+    }
+
 
 }

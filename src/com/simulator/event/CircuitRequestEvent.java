@@ -78,6 +78,9 @@ public class CircuitRequestEvent extends Event {
         Results.writeBlockingResults(generator, selectedFlow);
         Results.writeLinkUtilizationResults();
         Results.increaseRequestCounter();
+        ////////////////
+        Results.writeFiberLinkState();
+        ///////////////
 
         /** Add a new request event */
         TrafficClass nextTrafficClass = generator.getRandomPort();

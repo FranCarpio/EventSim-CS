@@ -71,6 +71,19 @@ public class NetworkState {
         return lightPaths;
     }
 
+    public static List<LightPath> getListOfLightPaths(EdgeElement edge) {
+        List<LightPath> lightPaths = new ArrayList<>();
+
+        for (LightPath lp : listOfLightPaths)
+            for (EdgeElement e:lp.getPathElement().getTraversedEdges())
+                if (e.equals(edge)) {
+                    lightPaths.add(lp);
+                    break;
+                }
+
+        return lightPaths;
+    }
+
     public static PathElement getPathElement(List<VertexElement> vertexes) {
 
         for (Path path : listOfPaths)
