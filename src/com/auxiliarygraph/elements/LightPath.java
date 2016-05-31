@@ -45,6 +45,12 @@ public class LightPath {
         return pathElement;
     }
 
+
+    /**
+     * CHECK THIS FUNCTION (BUG) !!!!!!!!!!!!!!`
+     * @param bw
+     * @param connection
+     */
     public void expandLightPathOnLeftSide(int bw, Connection connection) {
 
         int firstFreeMiniGrid = miniGridIds.get(0) - 1;

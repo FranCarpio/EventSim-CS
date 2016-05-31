@@ -5,7 +5,7 @@ nsf-network.txt
 # Total number of requests for reports
 1000
 # Number of simulations
-4
+1
 # g: grid granularity (Ghz)
 5
 # Modulation format (bits/s/Hz)
