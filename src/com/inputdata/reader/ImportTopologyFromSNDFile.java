@@ -6,6 +6,8 @@ import com.graph.elements.edge.params.impl.BasicEdgeParams;
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
 import com.launcher.SimulatorParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,8 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
         return paths;
     }
 
+    private static final Logger log = LoggerFactory.getLogger(ImportTopologyFromSNDFile.class);
+
     @Override
     public void importTopology(Gcontroller graph, String filename) {
 
@@ -59,13 +63,17 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
             String[] temp1 = new String[SimulatorParameters.getNumberOfRuns()];
             int count = 0;
             while (m.find()) {
+                if (count >= temp1.length) {
+                    log.error("The number of runs do not match with the scaling factors");
+                    System.exit(0);
+                }
                 temp1[count] = m.group(1).trim();
                 count++;
             }
             if (count > 1) {
                 String tmp = "";
                 for (int i = 0; i < count; i++) {
-                    tmp += temp1[i]+" ";
+                    tmp += temp1[i] + " ";
                 }
                 parameters.add(tmp);
             } else
@@ -80,10 +88,6 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
         // read till we reach the end of node definitions
         while ((temp = ReadFile.readLine()) != null) {
             temp = temp.trim();
-            // System.out.println(temp);
-            // if (temp.length()==1){
-            // break;
-            // }
             if (temp.trim().compareTo(")") == 0) {
                 break;
             }
@@ -98,8 +102,6 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
                 sourceID = m.group(0);
             }
 
-            // p = Pattern.compile("[0-9\\.]+");
-            // m = p.matcher(temp);
             double[] temp1 = new double[2];
             int count = 0;
             while (m.find()) {
@@ -111,9 +113,6 @@ public class ImportTopologyFromSNDFile extends com.graph.topology.importers.Impo
 
             vertex1 = new VertexElement(sourceID, graph, temp1[0], temp1[1]);
             graph.addVertex(vertex1);
-            // System.out.println("Vertex Added: VertexID=" +
-            // vertex1.getVertexID()+ ", X=" + vertex1.getXCoord() + ", Y="
-            // + vertex1.getYCoord());
         }
 
         // Read till we get to Edge definition)

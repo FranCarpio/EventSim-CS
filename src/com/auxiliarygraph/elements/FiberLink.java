@@ -4,6 +4,7 @@ import com.graph.elements.edge.EdgeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -86,7 +87,7 @@ public class FiberLink {
         return true;
     }
 
-    public double getUtilization() {
+    public String getUtilization() {
 
         int usedMiniGrids = 0;
 
@@ -94,10 +95,11 @@ public class FiberLink {
             if (entry.getValue() == 1 || entry.getValue() == 2)
                 usedMiniGrids++;
 
-        return (double) usedMiniGrids / miniGrids.size();
+        DecimalFormat df = new DecimalFormat("0.000");
+        return df.format((double) usedMiniGrids / miniGrids.size());
     }
 
-    public double getNetUtilization() {
+    public String getNetUtilization() {
 
         int usedMiniGrids = 0;
 
@@ -105,7 +107,8 @@ public class FiberLink {
             if (entry.getValue() == 1)
                 usedMiniGrids++;
 
-        return (double) usedMiniGrids / miniGrids.size();
+        DecimalFormat df = new DecimalFormat("0.000");
+        return df.format((double) usedMiniGrids / miniGrids.size());
     }
 
     public void setFreeMiniGrid(int id) {

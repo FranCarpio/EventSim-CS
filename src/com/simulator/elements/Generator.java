@@ -28,49 +28,31 @@ import java.util.stream.Collectors;
  */
 public class Generator {
 
-    /**
-     * Set of Flows for the generator
-     */
+    /** Set of Flows for the generator*/
     private List<TrafficFlow> listOfTrafficFlows;
 
-    /**
-     * Belonging vertex element
-     */
+    /** Belonging vertex element*/
     private VertexElement vertex;
 
-    /**
-     * Distribution for the generation of requests
-     */
+    /** Distribution for the generation of requests*/
     private Distribution requestDistribution;
 
-    /**
-     * Distribution for destinations
-     */
+    /** Distribution for destinations*/
     private Distribution destinationDistribution;
 
-    /**
-     * Distribution for port class
-     */
+    /** Distribution for port class*/
     private Distribution portDistribution;
 
-    /**
-     * Distribution for known or unknown
-     */
+    /** Distribution for known or unknown*/
     private Distribution unknownDistribution;
 
-    /**
-     * Traffic class probabilities
-     */
+    /** Traffic class probabilities*/
     private List<Double> trafficClassProb;
 
-    /**
-     * Destination probabilities
-     */
+    /** Destination probabilities*/
     private List<List<Double>> destinationProb;
 
-    /**
-     *
-     */
+    /***/
     private byte[] seedForArrivalRNG;
 
     private static final Logger log = LoggerFactory.getLogger(Generator.class);

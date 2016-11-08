@@ -25,20 +25,11 @@ import java.util.*;
 public class SimulatorParameters {
 
     private static String networkFile;
-    private static int numberOfTotalRequests;
-    private static int numberOfRequestForReports;
-    private static int numberOfRuns;
+    private static int numberOfTotalRequests, numberOfRequestForReports, numberOfRuns, modulationFormat, gridGranularity, numOfMiniGridsPerGB, txCapacityOfTransponders, policy, seedCounter;
     private static List<byte[]> listOfSeeds;
-    private static int seedCounter;
-    private static int modulationFormat;
-    private static int gridGranularity;
-    private static int numOfMiniGridsPerGB;
-    private static int txCapacityOfTransponders;
     private static List<Generator> listOfGenerators;
     private static int _runNumber = -1;
-    private static int policy;
-    private static int deFragmentationMethod;
-    private static String fiberLinkStateParameter;
+    private static boolean debugMode;
     private static final Logger log = LoggerFactory.getLogger(SimulatorParameters.class);
 
     /**
@@ -63,24 +54,29 @@ public class SimulatorParameters {
             System.exit(0);
         } else {
             _runNumber++;
-            log.info("Starting run number " + _runNumber);
+            log.info("Preparing run number " + _runNumber);
         }
 
+        log.info("Initializing the scheduler");
         /** Initialize the scheduler*/
         new Scheduler();
 
         /** Create new result files*/
+        log.info("Creating new result files");
         new Results();
 
         InputParameters.readNetworkParameters();
         InputParameters.setNodes();
+        log.info("Updating network state");
         new NetworkState(InputParameters.getGraph(), gridGranularity, txCapacityOfTransponders, numOfMiniGridsPerGB, setPaths(ImportTopologyFromSNDFile.getPaths()), policy);
+        log.info("Initializing generators");
         listOfGenerators = new ArrayList<>();
         for (Source s : InputParameters.getListOfSources())
             listOfGenerators.add(new Generator(s.getVertex(), s.getListOfTrafficDemands(), s.getArrivalRate(), s.getTrafficClassProb(), s.getDestinationProb()));
         listOfGenerators.forEach(Generator::initialize);
 
         /** Run the simulation */
+        log.info("Starting simulation...");
         Scheduler.startSim();
     }
 
@@ -116,7 +112,6 @@ public class SimulatorParameters {
             PathElement pathElement = new PathElementImpl(graph, graph.getVertex(listOfNodes.get(0)), graph.getVertex(listOfNodes.get(listOfNodes.size() - 1)), listOfIntermediateLinks);
 
             setOfPathElements.add(pathElement);
-            log.info("Path Element: " + pathElement.getVertexSequence());
         }
 
         return setOfPathElements;
@@ -128,6 +123,7 @@ public class SimulatorParameters {
      */
     public static void readConfigFile(String pathFile) throws IOException {
 
+        log.info("Reading the config file");
         listOfSeeds = new ArrayList<>();
         new ReadFile(pathFile);
         String line = ReadFile.readLine();
@@ -163,26 +159,32 @@ public class SimulatorParameters {
                         policy = Integer.parseInt(line);
                         break;
                     case 9:
-                        deFragmentationMethod = Integer.parseInt(line);
+                        if (line.equals("true"))
+                            debugMode = true;
+                        else
+                            debugMode = false;
                         break;
-                    case 10:
-                        fiberLinkStateParameter = line;
-                        break;
-                    case 11:
-                        while (line != null) {
-                            line = line.replaceAll("\\s+", "");
-                            byte[] seed = new BigInteger(line, 2).toByteArray();
-                            if (seed.length == 17) {
-                                byte[] seedCopy = new byte[16];
-                                for (int i = 0; i < seed.length - 1; i++)
-                                    seedCopy[i] = seed[i + 1];
-                                listOfSeeds.add(seedCopy);
-                            } else
-                                listOfSeeds.add(seed);
-                            line = ReadFile.readLine();
-                        }
                 }
                 lineCounter++;
+            }
+            line = ReadFile.readLine();
+        }
+        new ReadFile("seeds.txt");
+        line = ReadFile.readLine();
+        while (line != null) {
+            if (!line.startsWith("#")) {
+                while (line != null) {
+                    line = line.replaceAll("\\s+", "");
+                    byte[] seed = new BigInteger(line, 2).toByteArray();
+                    if (seed.length == 17) {
+                        byte[] seedCopy = new byte[16];
+                        for (int i = 0; i < seed.length - 1; i++)
+                            seedCopy[i] = seed[i + 1];
+                        listOfSeeds.add(seedCopy);
+                    } else
+                        listOfSeeds.add(seed);
+                    line = ReadFile.readLine();
+                }
             }
             line = ReadFile.readLine();
         }
@@ -217,11 +219,11 @@ public class SimulatorParameters {
         return numberOfRuns;
     }
 
-    public static int getDeFragmentationMethod() {
-        return deFragmentationMethod;
+    public static String getFiberLinkStateParameter() {
+        return "10000-10010 N12-N2";
     }
 
-    public static String getFiberLinkStateParameter() {
-        return fiberLinkStateParameter;
+    public static boolean isDebugMode() {
+        return debugMode;
     }
 }

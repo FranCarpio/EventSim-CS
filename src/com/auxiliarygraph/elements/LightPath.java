@@ -3,7 +3,6 @@ package com.auxiliarygraph.elements;
 import com.auxiliarygraph.NetworkState;
 import com.graph.elements.edge.EdgeElement;
 import com.graph.path.PathElement;
-import com.launcher.SimulatorParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,7 @@ public class LightPath {
     private Map<Double, Connection> connectionMap;
     private static final Logger log = LoggerFactory.getLogger(LightPath.class);
     private final int GUARD_BANDS;
-    private static final int DEFRAG_METHOD = SimulatorParameters.getDeFragmentationMethod();
+    private static final int DEFRAG_METHOD = 0;
 
     public LightPath(PathElement pathElement, int initialMiniGrid, int bwWithGB, int bw, Connection connection) {
         this.pathElement = pathElement;
@@ -48,6 +47,7 @@ public class LightPath {
 
     /**
      * CHECK THIS FUNCTION (BUG) !!!!!!!!!!!!!!`
+     *
      * @param bw
      * @param connection
      */
@@ -150,7 +150,7 @@ public class LightPath {
         }
     }
 
-    public void applyCompressionByRightSide(Connection connection){
+    public void applyCompressionByRightSide(Connection connection) {
 
         int lastMiniGrid = miniGridIds.size() - 1;
         for (int i = lastMiniGrid; i > lastMiniGrid - connection.getBw(); i--)

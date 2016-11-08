@@ -9,6 +9,8 @@ import com.inputdata.elements.TrafficClass;
 import com.inputdata.elements.TrafficDemand;
 import com.inputdata.reader.ImportTopologyFromSNDFile;
 import com.launcher.SimulatorParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class InputParameters {
     private static String arrivalProcess;
     private static List<TrafficDemand> listOfTrafficDemands;
     private static List<Source> listOfSources;
+    private static final Logger log = LoggerFactory.getLogger(InputParameters.class);
 
     /**
      * Constructor class
@@ -36,6 +39,7 @@ public class InputParameters {
     public InputParameters(String networkTopologyFileName) {
 
         /** Import topology*/
+        log.info("Importing SNDLib file");
         graph = new GcontrollerImpl();
         ImportTopologyFromSNDFile importer = new ImportTopologyFromSNDFile();
         importer.importTopology(graph, networkTopologyFileName);

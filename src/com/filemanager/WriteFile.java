@@ -1,12 +1,11 @@
 package com.filemanager;
 
-import com.launcher.Launcher;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -24,10 +23,10 @@ public class WriteFile {
 
         SimpleDateFormat MY_FORMAT = new SimpleDateFormat(
                 "dd-MM-yyyy HH-mm-ss", Locale.getDefault());
-//		Date date = new Date();
+		Date date = new Date();
 
         String path = WriteFile.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        String folder = path + "/../" + MY_FORMAT.format(Launcher.getDate());
+        String folder = path + "/../" + MY_FORMAT.format(date);
         new File(folder).mkdir();
 
         file = new File(folder + "/" + fileName + ".txt");

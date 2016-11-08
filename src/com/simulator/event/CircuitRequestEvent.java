@@ -49,12 +49,11 @@ public class CircuitRequestEvent extends Event {
 
         holdingTime = trafficClass.getHoldingTimeDistribution().execute();
 
-        /** If it is unknown, get the mean holding time*/
-//      if (isUnKnown)
-//      holdingTime = trafficClass.getMeanHoldingTime();
-
         /** Get a random destination following a uniform distribution */
         TrafficFlow selectedFlow = generator.getRandomFlow(trafficClass.getType());
+
+        if (SimulatorParameters.isDebugMode())
+            Results.writeInterArrivalTime(generator, selectedFlow, trafficClass.getType(), holdingTime);
 
         int numberOfMiniGrids = (int) (trafficClass.getBw() / SimulatorParameters.getModulationFormat()) / SimulatorParameters.getGridGranularity();
         /** Create a new Auxiliary Graph*/
@@ -65,8 +64,9 @@ public class CircuitRequestEvent extends Event {
             Event event = new CircuitReleaseEvent(new Entity(holdingTime), generator, selectedFlow, auxiliaryGraph.getNewConnection());
             Scheduler.schedule(event, holdingTime);
             log.debug("Added release event: " + generator.getVertex().getVertexID() + "-" + selectedFlow.getDstNode().getVertexID());
-// Activate only for debugging
-// Results.writeHoldingTime(generator,selectedFlow,trafficClass.getType(),isUnKnown,holdingTime);
+            if (SimulatorParameters.isDebugMode())
+                Results.writeHoldingTime(generator, selectedFlow, trafficClass.getType(), isUnKnown, holdingTime);
+
         } else { /**if not, increase blocking counter*/
             selectedFlow.increaseBlockingCounter(trafficClass.getType(), isUnKnown);
             log.debug("Connection is blocked");
@@ -80,8 +80,8 @@ public class CircuitRequestEvent extends Event {
         Results.writeLinkUtilizationResults();
         Results.increaseRequestCounter();
 
-// Activate only for debugging
-        Results.writeFiberLinkState();
+        if (SimulatorParameters.isDebugMode())
+            Results.writeFiberLinkState();
 
         /** Add a new request event */
         TrafficClass nextTrafficClass = generator.getRandomPort();
@@ -89,7 +89,5 @@ public class CircuitRequestEvent extends Event {
         Event event = new CircuitRequestEvent(new Entity(nextInterArrivalTime), generator, nextTrafficClass);
         Scheduler.schedule(event, nextInterArrivalTime);
         log.debug("Added request event: " + generator.getVertex().getVertexID() + "-" + selectedFlow.getDstNode().getVertexID());
-// Activate only for debugging
-// Results.writeInterArrivalTime(generator, selectedFlow,trafficClass.getType(),nextInterArrivalTime);
     }
 }

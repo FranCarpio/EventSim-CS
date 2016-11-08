@@ -1,15 +1,15 @@
 ?SNDlib
-# network nobel-us
+# Example of extended SNDlib file with META section
 
 # META SECTION
 
 META (
-  Arrival_process ( EXP-1.0 )
+  Arrival_process ( EXP-10 )
   Traffic_classes ( 3 )
   Bandwidths ( 10.0 40.0 100.0 )
-  Scaling ( 1.0989 0.43956 0.10989 ) ( 1.4652 0.58608 0.14652 ) ( 1.83150 0.7326 0.18315 ) ( 2.19780 0.87912 0.21978 )
+  Scaling ( 8 4 2 )
   Holding_time ( EXP-10.0-1.0 EXP-10.0-1.0 EXP-10.0-1.0 )
-  Connection_feature ( 0.0 0.0 0.0 )
+  Connection_feature ( 1.0 1.0 1.0 )
  )
 
 # NODE SECTION

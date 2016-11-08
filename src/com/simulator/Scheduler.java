@@ -33,7 +33,6 @@ public class Scheduler {
             currentTime = nextNode.getTime();
             nextEvent.occur();
         }
-
     }
 }
 
