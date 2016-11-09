@@ -2,7 +2,9 @@
 nsf-network.txt
 # Max number of total request events before to stop the simulation
 100000
-# Total number of requests for reports
+# Results: num. of requests for link utilization
+10000
+# Results: num. of requests for Blocking
 100
 # Number of simulations
 1

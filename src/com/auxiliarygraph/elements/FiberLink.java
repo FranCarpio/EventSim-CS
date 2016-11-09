@@ -112,14 +112,10 @@ public class FiberLink {
     }
 
     public void setFreeMiniGrid(int id) {
-//        if (miniGrids.get(id) == 0)
-//            log.error("BUG: setting free an already free Mini-Grid");
         miniGrids.replace(id, miniGrids.get(id), 0);
     }
 
     public void setUsedMiniGrid(int id) {
-//        if (miniGrids.get(id) == 1)
-//            log.error("BUG: setting as used an already used Mini-Grid");
         miniGrids.replace(id, miniGrids.get(id), 1);
     }
 
@@ -128,8 +124,6 @@ public class FiberLink {
     }
 
     public void setGuardBandMiniGrid(int id) {
-//        if (miniGrids.get(id) == 1)
-//            log.error("BUG: setting as guard band an already used Mini-Grid");
         miniGrids.replace(id, miniGrids.get(id), 2);
     }
 

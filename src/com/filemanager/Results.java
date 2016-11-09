@@ -4,12 +4,11 @@ import com.auxiliarygraph.NetworkState;
 import com.auxiliarygraph.elements.FiberLink;
 import com.auxiliarygraph.elements.LightPath;
 import com.inputdata.InputParameters;
+import com.launcher.Launcher;
 import com.launcher.SimulatorParameters;
 import com.simulator.Scheduler;
 import com.simulator.elements.Generator;
 import com.simulator.elements.TrafficFlow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -26,25 +25,22 @@ public class Results {
     private static WriteFile holdingTimeWriteFile;
     private static WriteFile fiberLinkStateFile;
     private static int linkRequestCounter;
-    private static int totalRequestCounter;
-    private static final Logger log = LoggerFactory.getLogger(Results.class);
 
     public Results() {
 
         try {
-            totalRequestCounter = 0;
             linkRequestCounter = 0;
             SimpleDateFormat MY_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss", Locale.getDefault());
             Date date = new Date();
             blockingWriteFile = new WriteFile("BlockingProb-run-" + SimulatorParameters.get_runNumber(), false);
             blockingWriteFile.write(MY_FORMAT.format(date) + "\n");
             blockingWriteFile.write("Blocking per SRC-DST nodes\n\n");
-            blockingWriteFile.write("S\tD\t T\t\tReq.\t\tBlocked\t\tSimTime\n");
+            blockingWriteFile.write("S\tD\t T\t\tReq.\tBlocked\t\tSimTime\n");
 
             linkUtilizationWriteFile = new WriteFile("LinkUtilization-run-" + SimulatorParameters.get_runNumber(), false);
             linkUtilizationWriteFile.write(MY_FORMAT.format(date) + "\n");
             linkUtilizationWriteFile.write("Fiber utilization\n\n");
-            linkUtilizationWriteFile.write("Fiber\t\tReq.\tSimTime\t\tU-NoGB\t\tU-GB\n");
+            linkUtilizationWriteFile.write("Fiber\t\tReq.\t\tSimTime\t\tU-NoGB\t\tU-GB\n");
 
             if (SimulatorParameters.isDebugMode()) {
                 interArrivalWriteFile = new WriteFile("MeanInterarrivalTimes-run-" + SimulatorParameters.get_runNumber(), false);
@@ -68,38 +64,22 @@ public class Results {
         }
     }
 
-    public static void increaseRequestCounter() {
-        totalRequestCounter++;
-        if (totalRequestCounter >= SimulatorParameters.getNumberOfTotalRequests()) {
-            log.info("Processed Requests: " + totalRequestCounter / 1000 + "K");
-            SimulatorParameters.runSimulation();
-        }
-        if (totalRequestCounter % 10000 == 0)
-            log.info("Processed Requests: " + totalRequestCounter / 1000 + "K");
-    }
-
     public static void writeLinkUtilizationResults() {
 
         linkRequestCounter++;
-        if (linkRequestCounter >= SimulatorParameters.getNumberOfRequestForReports()) {
+        if (linkRequestCounter >= SimulatorParameters.getNumOfRequestForLU()) {
             for (Map.Entry<String, FiberLink> entry : NetworkState.getFiberLinksMap().entrySet())
                 linkUtilizationWriteFile.write(entry.getValue().getEdgeElement().getSourceVertex().getVertexID()
                         .substring(1) + "\t" + entry.getValue().getEdgeElement().getDestinationVertex().getVertexID().substring(1)
                         + "\t\t" + linkRequestCounter + "\t\t" + getFormatSimTime() + "\t\t"
                         + entry.getValue().getNetUtilization() + "\t\t" + entry.getValue().getUtilization() + "\n");
-
             linkRequestCounter = 0;
         }
     }
 
     public static void writeBlockingResults(Generator gen, TrafficFlow flow) {
 
-        int totalRequestCounter = 0;
-
-        for (Counter counter : flow.getListOfCounters())
-            totalRequestCounter += counter.getFlowRequestCounter();
-
-        if (totalRequestCounter >= SimulatorParameters.getNumberOfRequestForReports()) {
+        if (flow.getRequestCounter() >= SimulatorParameters.getNumOfRequestForBlocking()) {
             for (int i = 0; i < flow.getListOfCounters().size(); i++) {
                 blockingWriteFile.write(gen.getVertex().getVertexID()
                         .substring(1) + "\t" + flow.getDstNode().getVertexID().substring(1) + "\t "
@@ -113,22 +93,17 @@ public class Results {
         }
     }
 
-    public static void writeHoldingTime(Generator gen, TrafficFlow flow, int portType,
-                                        boolean isKnown, double ht) {
+    public static void writeHoldingTime(Generator gen, TrafficFlow flow, int portType, boolean isKnown, double ht) {
         String knownOrNot;
-        if (isKnown)
-            knownOrNot = "U";
-        else
-            knownOrNot = "K";
-
+        if (isKnown) knownOrNot = "U";
+        else knownOrNot = "K";
         holdingTimeWriteFile.write(gen.getVertex().getVertexID().substring(1)
                 + "	" + flow.getDstNode().getVertexID().substring(1) + "	"
                 + portType + "	" + knownOrNot + "	" + ht + "	"
                 + getFormatSimTime() + "\n");
     }
 
-    public static void writeInterArrivalTime(Generator gen, TrafficFlow flow,
-                                             int portType, double interArrivalTime) {
+    public static void writeInterArrivalTime(Generator gen, TrafficFlow flow, int portType, double interArrivalTime) {
         interArrivalWriteFile.write(gen.getVertex().getVertexID().substring(1)
                 + "	" + flow.getDstNode().getVertexID().substring(1) + "	"
                 + portType + "	" + interArrivalTime + "	"
@@ -136,13 +111,12 @@ public class Results {
     }
 
     public static void writeFiberLinkState() {
-
         String[] param = SimulatorParameters.getFiberLinkStateParameter().split(" ");
         String[] interval = param[0].split("-");
         String[] nodes = param[1].split("-");
         FiberLink fb = NetworkState.getFiberLink(InputParameters.getGraph().getConnectingEdge(nodes[0], nodes[1]).getEdgeID());
 
-        if (totalRequestCounter >= Integer.parseInt(interval[0]) && totalRequestCounter < Integer.parseInt(interval[1])) {
+        if (Launcher.getRequestCounter() >= Integer.parseInt(interval[0]) && Launcher.getRequestCounter() < Integer.parseInt(interval[1])) {
             for (int i = 1; i <= fb.getTotalNumberOfMiniGrids(); i++) {
                 if (fb.getMiniGrid(i) == 0)
                     writeMiniGridState(fb, i, "free");
@@ -168,8 +142,8 @@ public class Results {
                 + "\n");
     }
 
-    public static String getFormatSimTime(){
-        DecimalFormat df = new DecimalFormat("#.#####");
+    public static String getFormatSimTime() {
+        DecimalFormat df = new DecimalFormat("0.0000");
         return df.format(Scheduler.currentTime());
     }
 

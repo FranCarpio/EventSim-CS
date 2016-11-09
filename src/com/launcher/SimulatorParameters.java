@@ -25,7 +25,7 @@ import java.util.*;
 public class SimulatorParameters {
 
     private static String networkFile;
-    private static int numberOfTotalRequests, numberOfRequestForReports, numberOfRuns, modulationFormat, gridGranularity, numOfMiniGridsPerGB, txCapacityOfTransponders, policy, seedCounter;
+    private static int totalNumOfRequests, numOfRequestForLU, numOfRequestForBlocking, numberOfRuns, modulationFormat, gridGranularity, numOfMiniGridsPerGB, txCapacityOfTransponders, policy, seedCounter;
     private static List<byte[]> listOfSeeds;
     private static List<Generator> listOfGenerators;
     private static int _runNumber = -1;
@@ -135,30 +135,33 @@ public class SimulatorParameters {
                         networkFile = line;
                         break;
                     case 1:
-                        numberOfTotalRequests = Integer.parseInt(line);
+                        totalNumOfRequests = Integer.parseInt(line);
                         break;
                     case 2:
-                        numberOfRequestForReports = Integer.parseInt(line);
+                        numOfRequestForLU = Integer.parseInt(line);
                         break;
                     case 3:
-                        numberOfRuns = Integer.parseInt(line);
+                        numOfRequestForBlocking = Integer.parseInt(line);
                         break;
                     case 4:
-                        gridGranularity = Integer.parseInt(line);
+                        numberOfRuns = Integer.parseInt(line);
                         break;
                     case 5:
-                        modulationFormat = Integer.parseInt(line);
+                        gridGranularity = Integer.parseInt(line);
                         break;
                     case 6:
-                        numOfMiniGridsPerGB = Integer.parseInt(line);
+                        modulationFormat = Integer.parseInt(line);
                         break;
                     case 7:
-                        txCapacityOfTransponders = Integer.parseInt(line);
+                        numOfMiniGridsPerGB = Integer.parseInt(line);
                         break;
                     case 8:
-                        policy = Integer.parseInt(line);
+                        txCapacityOfTransponders = Integer.parseInt(line);
                         break;
                     case 9:
+                        policy = Integer.parseInt(line);
+                        break;
+                    case 10:
                         if (line.equals("true"))
                             debugMode = true;
                         else
@@ -195,12 +198,17 @@ public class SimulatorParameters {
         return listOfSeeds.get(seedCounter);
     }
 
-    public static int getNumberOfTotalRequests() {
-        return numberOfTotalRequests;
+
+    public static int getTotalNumOfRequests() {
+        return totalNumOfRequests;
     }
 
-    public static int getNumberOfRequestForReports() {
-        return numberOfRequestForReports;
+    public static int getNumOfRequestForLU() {
+        return numOfRequestForLU;
+    }
+
+    public static int getNumOfRequestForBlocking() {
+        return numOfRequestForBlocking;
     }
 
     public static int get_runNumber() {

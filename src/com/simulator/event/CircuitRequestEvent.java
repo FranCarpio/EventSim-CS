@@ -3,6 +3,7 @@ package com.simulator.event;
 import com.auxiliarygraph.AuxiliaryGraph;
 import com.filemanager.Results;
 import com.inputdata.elements.TrafficClass;
+import com.launcher.Launcher;
 import com.launcher.SimulatorParameters;
 import com.simulator.Scheduler;
 import com.simulator.elements.Generator;
@@ -78,7 +79,7 @@ public class CircuitRequestEvent extends Event {
         /*********************** Results *************************/
         Results.writeBlockingResults(generator, selectedFlow);
         Results.writeLinkUtilizationResults();
-        Results.increaseRequestCounter();
+        Launcher.increaseRequestCounter();
 
         if (SimulatorParameters.isDebugMode())
             Results.writeFiberLinkState();

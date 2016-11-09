@@ -3,18 +3,12 @@ package com.simulator.elements;
 import com.auxiliarygraph.elements.Path;
 import com.filemanager.Counter;
 import com.graph.elements.vertex.VertexElement;
-import com.graph.path.PathElement;
 import com.inputdata.InputParameters;
-import com.launcher.Launcher;
-import com.launcher.SimulatorParameters;
-import com.simulator.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Class to represent a Flow in the network
@@ -63,6 +57,13 @@ public class TrafficFlow {
         listOfCounters.get(portType).increaseBlockingCounter();
         if (isNotKnown)
             listOfCounters.get(portType).increaseBlockingCounterForUnknownHT();
+    }
+
+    public int getRequestCounter() {
+        int requestCounter = 0;
+        for (Counter counter : listOfCounters)
+            requestCounter += counter.getFlowRequestCounter();
+        return requestCounter;
     }
 
     /**
